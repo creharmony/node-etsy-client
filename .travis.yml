@@ -18,4 +18,4 @@ jobs:
         - npm publish
       on:
         tags: true
-        branch: master
+        branch: main
