@@ -12,6 +12,7 @@ class EtsyClient {
     this.apiUrl = process.env.ETSY_API_ENDPOINT || 'https://openapi.etsy.com/v2'
     this.apiKey = process.env.ETSY_API_KEY || options.apiKey;
     this.shop   = process.env.ETSY_SHOP || options.shop;
+    this.lang   = process.env.ETSY_LANG || options.lang || null;
     this._assumeApiKey();
   }
 
@@ -78,6 +79,9 @@ class EtsyClient {
   getOptions(options) {
     var merged = options ? options : {};
     merged['api_key'] = this.apiKey;
+    if (this.lang != null) {
+      merged['language'] = this.lang;
+    }
     return merged;
   }
 
