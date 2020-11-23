@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "description": "node-etsy-client",
   "main": "./src/EtsyClient.js",
+  "types": "./src/EtsyClient.d.ts",
   "scripts": {
     "test": "mocha test/*.test.js"
   },
