@@ -15,22 +15,38 @@ async function sample_etsy_usage() {
   var productsLimit = 5;
   var imagesLimit = 5;
 
-  logger.info(" - get 2 first shops after ", {shopOffset});
-  var twoShops = await client.getShops({'limit':2, 'offset':shopOffset}).catch((err)=>console.log("getShop err", err));
+  logger.info(" - [findAllShops] get 2 first shops after ", {shopOffset});
+  var twoShops = await client.findAllShops({'limit':2, 'offset':shopOffset})
+                             .catch((err)=>console.log("findAllShops err", err));
   logger.debug("twoShops",{twoShops});
   logger.info(" * 2 shops ", {'shop0':twoShops.results[0].shop_name,
                               'shop1':twoShops.results[1].shop_name,
                               'total count':twoShops.count });
 
-  client.shop = twoShops.results[0].shop_name
-  logger.info(" - get shop details for ", {'shop':client.shop});
-  var shopDetails = await client.getShop().catch((err)=>console.log("getShop err", err));
+  client.shop = twoShops.results[0].shop_name;
+  client.shop = 'creharmony';
+
+  logger.info(" - [getShop] get shop details for ", {'shop':client.shop});
+  var shopDetails = await client.getShop()
+                                .catch((err)=>console.log("getShop err", err));
   logger.info(" * getShop shop_id", {'shopId':shopDetails.results[0].shop_id})
 
-  logger.info(" - get shop active listings ", {'shop':client.shop, 'limit':productsLimit });
+  logger.info(" - [findAllShopSections] get shop sections for ", {'shop':client.shop });
+  var shopSections = await client.findAllShopSections()
+                                  .catch((err)=>console.log("findAllShopSections err", err));
+  if (shopSections.count < 1) {
+    logger.info(" x none");
+    return;
+  }
+  shopSections.results.forEach(element => {
+    logger.info(" * #"+ element.shop_section_id+ " (rank:"+ element.rank + ") " + element.title +
+               " - count:"+ element.active_listing_count);
+  })
+
+  logger.info(" - [findAllShopListingsActive] get shop active listings ", {'shop':client.shop, 'limit':productsLimit });
   var listOptions = {language:'fr', translate_keywords:true, limit: productsLimit, offset:0};
-  var activeListings = await client.getShopActiveListings(listOptions)
-        .catch((err)=>console.log("getShopActiveListings err", err));
+  var activeListings = await client.findAllShopListingsActive(listOptions)
+                                   .catch((err)=>console.log("findAllShopListingsActive err", err));
 
   if (activeListings.count < 1) {
     logger.info(" x none");
@@ -42,9 +58,9 @@ async function sample_etsy_usage() {
   })
 
   var listingId = activeListings.results[0].listing_id;
-  logger.info(" - get first product related images ", {listingId, 'limit':imagesLimit});
-  var firstListingImages = await client.getListingImages(listingId, {limit:imagesLimit})
-        .catch((err)=>console.log("getListingImages err", err));
+  logger.info(" - [findAllListingImages] get first product related images ", {listingId, 'limit':imagesLimit});
+  var firstListingImages = await client.findAllListingImages(listingId, {limit:imagesLimit})
+                                       .catch((err)=>console.log("findAllListingImages err", err));
   // console.info("firstListingImages", firstListingImages);
   if (firstListingImages.count < 1) {
     logger.info("no image");
@@ -54,7 +70,6 @@ async function sample_etsy_usage() {
                  element.url_fullxfull);
     })
   }
-
 }
 
 

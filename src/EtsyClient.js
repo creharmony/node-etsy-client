@@ -1,6 +1,10 @@
 const queryString = require('query-string');
 const fetch = require("node-fetch");
 
+/**
+ * this utility class implement ETSY (some) methods documented here:
+ * https://www.etsy.com/developers/documentation > API Reference
+ **/
 class EtsyClient {
 
   static debug = process.env.ETSY_DEBUG && process.env.ETSY_DEBUG === true;
@@ -16,7 +20,8 @@ class EtsyClient {
     this._assumeApiKey();
   }
 
-  getShops(options) {
+  // https://www.etsy.com/developers/documentation/reference/shop#method_findallshops
+  findAllShops(options) {
      return new Promise((resolve, reject) => {
          const getQueryString = queryString.stringify(this.getOptions(options));
          fetch(`${this.apiUrl}/shops?${getQueryString}`)
@@ -25,6 +30,7 @@ class EtsyClient {
      });
   }
 
+  // https://www.etsy.com/developers/documentation/reference/shop#method_getshop
   getShop(options) {
      this._assumeShop();
      return new Promise((resolve, reject) => {
@@ -35,8 +41,19 @@ class EtsyClient {
      });
   }
 
+  // https://www.etsy.com/developers/documentation/reference/shopsection#method_findallshopsections
+  findAllShopSections(listingId, options) {
+     this._assumeShop();
+     return new Promise((resolve, reject) => {
+         const getQueryString = queryString.stringify(this.getOptions(options));
+         fetch(`${this.apiUrl}/shops/${this.shop}/sections?${getQueryString}`)
+           .then(response => EtsyClient._response(response, resolve, reject))
+           .catch(reject);
+     });
+  }
+
   // https://www.etsy.com/developers/documentation/reference/listing#method_findallshoplistingsactive
-  getShopActiveListings(options) {
+  findAllShopListingsActive(options) {
      this._assumeShop();
      return new Promise((resolve, reject) => {
          const getQueryString = queryString.stringify(this.getOptions(options));
@@ -46,6 +63,7 @@ class EtsyClient {
      });
   }
 
+  // https://www.etsy.com/developers/documentation/reference/listing#method_getlisting
   getListing(listingId, options) {
      this._assumeField('listingId', listingId);
      return new Promise((resolve, reject) => {
@@ -56,6 +74,7 @@ class EtsyClient {
      });
   }
 
+  // https://www.etsy.com/developers/documentation/reference/listingvariationimage#method_getvariationimages
   getVariationImages(listingId, options) {
      this._assumeField('listingId', listingId);
      return new Promise((resolve, reject) => {
@@ -66,7 +85,8 @@ class EtsyClient {
      });
   }
 
-  getListingImages(listingId, options) {
+  // https://www.etsy.com/developers/documentation/reference/listingimage#method_findalllistingimages
+  findAllListingImages(listingId, options) {
      this._assumeField('listingId', listingId);
      return new Promise((resolve, reject) => {
          const getQueryString = queryString.stringify(this.getOptions(options));
