@@ -8,10 +8,11 @@ declare module 'node-etsy-client' {
   export default class EtsyClient {
     constructor(options?: EtsyClientOptions);
 
-    getShops(options?: EtsyClientOptions): Promise<string | object>;
+    findAllShops(options?: EtsyClientOptions): Promise<string | object>;
 
     getShop(options?: EtsyClientOptions): Promise<string | object>;
- 
+
+    findAllShopSections(listingId: number, npoptions?: EtsyClientOptions): Promise<string | object>;
    /**
     * Finds all active Listings associated with a Shop.
     * 
@@ -21,7 +22,7 @@ declare module 'node-etsy-client' {
     * shop, but which can be managed. This is an experimental feature and may
     * change.)
     */
-   getShopActiveListings(options?: Partial<{
+   findAllShopListingsActive(options?: Partial<{
      limit: number;
      offset: number;
      page: number;
@@ -43,7 +44,7 @@ declare module 'node-etsy-client' {
  
    getVariationImages(listingId: number, options?: object): Promise<string | object>;
  
-   getListingImages(listingId: number, options?: object): Promise<string | object>;
+   findAllListingImages(listingId: number, options?: object): Promise<string | object>;
  
    getOptions(options: EtsyClientOptions): EtsyClientOptions;
   }
