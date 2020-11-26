@@ -6,7 +6,7 @@ stages:
 
 jobs:
   include:
-    - stage: test_api
+    - stage: test
       script:
         - npm install
         - npm run test
