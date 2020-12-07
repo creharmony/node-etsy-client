@@ -107,3 +107,7 @@ dist
 *.iml
 
 package-lock.json
+
+# drafts
+__*/
+*.dontpush.*

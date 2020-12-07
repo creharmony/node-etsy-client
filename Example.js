@@ -24,7 +24,8 @@ async function sample_etsy_usage() {
                               'total count':twoShops.count });
 
   client.shop = twoShops.results[0].shop_name;
-  client.shop = 'creharmony';
+
+  // client.shop = 'enforceYourShopNameHere';
 
   logger.info(" - [getShop] get shop details for ", {'shop':client.shop});
   var shopDetails = await client.getShop()
@@ -36,12 +37,12 @@ async function sample_etsy_usage() {
                                   .catch((err)=>console.log("findAllShopSections err", err));
   if (shopSections.count < 1) {
     logger.info(" x none");
-    return;
+  } else {
+    shopSections.results.forEach(element => {
+      logger.info(" * #"+ element.shop_section_id+ " (rank:"+ element.rank + ") " + element.title +
+                 " - count:"+ element.active_listing_count);
+    })
   }
-  shopSections.results.forEach(element => {
-    logger.info(" * #"+ element.shop_section_id+ " (rank:"+ element.rank + ") " + element.title +
-               " - count:"+ element.active_listing_count);
-  })
 
   logger.info(" - [findAllShopListingsActive] get shop active listings ", {'shop':client.shop, 'limit':productsLimit });
   var listOptions = {language:'fr', translate_keywords:true, limit: productsLimit, offset:0};
