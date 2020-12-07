@@ -45,7 +45,13 @@ declare module 'node-etsy-client' {
    getVariationImages(listingId: number, options?: object): Promise<string | object>;
  
    findAllListingImages(listingId: number, options?: object): Promise<string | object>;
- 
+
+   getInventory(listingId: number, options?: object): Promise<string | object>;
+
+   getAttributes(listingId: number, options?: object): Promise<string | object>;
+
+   getProduct(listingId: number, productId: number, options?: object): Promise<string | object>;
+
    getOptions(options: EtsyClientOptions): EtsyClientOptions;
   }
 }
