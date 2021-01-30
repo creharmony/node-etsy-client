@@ -13,122 +13,90 @@ class EtsyClient {
     if (!options) {
       options = {};
     }
-    this.apiUrl = process.env.ETSY_API_ENDPOINT || 'https://openapi.etsy.com/v2'
-    this.apiKey = process.env.ETSY_API_KEY || options.apiKey;
-    this.shop   = process.env.ETSY_SHOP || options.shop;
-    this.lang   = process.env.ETSY_LANG || options.lang || null;
+    this.apiUrl = options.apiUrl || process.env.ETSY_API_ENDPOINT || 'https://openapi.etsy.com/v2'
+    this.apiKey = options.apiKey || process.env.ETSY_API_KEY;
+    this.shop   = options.shop   || process.env.ETSY_SHOP;
+    this.lang   = options.lang   || process.env.ETSY_LANG;
     this._assumeApiKey();
   }
 
   // https://www.etsy.com/developers/documentation/reference/shop#method_findallshops
   findAllShops(options) {
-     return new Promise((resolve, reject) => {
-         const getQueryString = queryString.stringify(this.getOptions(options));
-         fetch(`${this.apiUrl}/shops?${getQueryString}`)
-           .then(response => EtsyClient._response(response, resolve, reject))
-           .catch(reject);
-     });
+    return this.etsyApiFetch(`/shops`, options);
   }
 
   // https://www.etsy.com/developers/documentation/reference/shop#method_getshop
   getShop(options) {
      this._assumeShop();
-     return new Promise((resolve, reject) => {
-         const getQueryString = queryString.stringify(this.getOptions(options));
-         fetch(`${this.apiUrl}/shops/${this.shop}?${getQueryString}`)
-           .then(response => EtsyClient._response(response, resolve, reject))
-           .catch(reject);
-     });
+     return this.etsyApiFetch(`/shops/${this.shop}`, options);
   }
 
   // https://www.etsy.com/developers/documentation/reference/shopsection#method_findallshopsections
   findAllShopSections(listingId, options) {
      this._assumeShop();
-     return new Promise((resolve, reject) => {
-         const getQueryString = queryString.stringify(this.getOptions(options));
-         fetch(`${this.apiUrl}/shops/${this.shop}/sections?${getQueryString}`)
-           .then(response => EtsyClient._response(response, resolve, reject))
-           .catch(reject);
-     });
+     return this.etsyApiFetch(`/shops/${this.shop}/sections`, options);
   }
 
   // https://www.etsy.com/developers/documentation/reference/listing#method_findallshoplistingsactive
   findAllShopListingsActive(options) {
      this._assumeShop();
-     return new Promise((resolve, reject) => {
-         const getQueryString = queryString.stringify(this.getOptions(options));
-         fetch(`${this.apiUrl}/shops/${this.shop}/listings/active?${getQueryString}`)
-           .then(response => EtsyClient._response(response, resolve, reject))
-           .catch(reject);
-     });
+     return this.etsyApiFetch(`/shops/${this.shop}/listings/active`, options);
   }
 
   // https://www.etsy.com/developers/documentation/reference/listing#method_getlisting
   getListing(listingId, options) {
      this._assumeField('listingId', listingId);
-     return new Promise((resolve, reject) => {
-         const getQueryString = queryString.stringify(this.getOptions(options));
-         fetch(`${this.apiUrl}/listings/${listingId}?${getQueryString}`)
-           .then(response => EtsyClient._response(response, resolve, reject))
-           .catch(reject);
-     });
+     return this.etsyApiFetch(`/listings/${listingId}`, options);
   }
 
   // https://www.etsy.com/developers/documentation/reference/listingvariationimage#method_getvariationimages
   getVariationImages(listingId, options) {
      this._assumeField('listingId', listingId);
-     return new Promise((resolve, reject) => {
-         const getQueryString = queryString.stringify(this.getOptions(options));
-         fetch(`${this.apiUrl}/listings/${listingId}/variation-images?${getQueryString}`)
-           .then(response => EtsyClient._response(response, resolve, reject))
-           .catch(reject);
-     });
+     return this.etsyApiFetch(`/listings/${listingId}/variation-images`, options);
   }
 
   // https://www.etsy.com/developers/documentation/reference/listingimage#method_findalllistingimages
   findAllListingImages(listingId, options) {
      this._assumeField('listingId', listingId);
-     return new Promise((resolve, reject) => {
-         const getQueryString = queryString.stringify(this.getOptions(options));
-         fetch(`${this.apiUrl}/listings/${listingId}/images?${getQueryString}`)
-           .then(response => EtsyClient._response(response, resolve, reject))
-           .catch(reject);
-     });
+     return this.etsyApiFetch(`/listings/${listingId}/images`, options);
   }
 
   // https://www.etsy.com/developers/documentation/reference/listinginventory
   getInventory(listingId, options) {
      this._assumeField('listingId', listingId);
-     return new Promise((resolve, reject) => {
-         const getQueryString = queryString.stringify(this.getOptions(options));
-         fetch(`${this.apiUrl}/listings/${listingId}/inventory?${getQueryString}`)
-           .then(response => EtsyClient._response(response, resolve, reject))
-           .catch(reject);
-     });
+     return this.etsyApiFetch(`/listings/${listingId}/inventory`, options);
   }
 
   // https://www.etsy.com/developers/documentation/reference/propertyvalue#method_getattribute
   getAttributes(listingId, options) {
      this._assumeField('listingId', listingId);
-     return new Promise((resolve, reject) => {
-         const getQueryString = queryString.stringify(this.getOptions(options));
-         fetch(`${this.apiUrl}/listings/${listingId}/attributes?${getQueryString}`)
-           .then(response => EtsyClient._response(response, resolve, reject))
-           .catch(reject);
-     });
+     return this.etsyApiFetch(`/listings/${listingId}/attributes`, options);
   }
 
   // https://www.etsy.com/developers/documentation/reference/listingproduct#method_getproduct
   getProduct(listingId, productId, options) {
      this._assumeField('listingId', listingId);
      this._assumeField('productId', productId);
+     return this.etsyApiFetch(`/listings/${listingId}/products/${productId}`, options);
+  }
+
+
+  // https://www.etsy.com/developers/documentation/reference/shippinginfo#method_findalllistingshippingprofileentries
+  findAllListingShippingProfileEntries(listingId, options) {
+     this._assumeField('listingId', listingId);
+     return this.etsyApiFetch(`/listings/${listingId}/shipping/info`, options);
+  }
+
+  etsyApiFetch(endpoint, options) {
+     this._assumeField('endpoint', endpoint);
      return new Promise((resolve, reject) => {
          const getQueryString = queryString.stringify(this.getOptions(options));
-         fetch(`${this.apiUrl}/listings/${listingId}/products/${productId}?${getQueryString}`)
+         fetch(`${this.apiUrl}${endpoint}?${getQueryString}`)
            .then(response => EtsyClient._response(response, resolve, reject))
            .catch(reject);
      });
   }
+
 
   getOptions(options) {
     var merged = options ? options : {};

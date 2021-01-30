@@ -1,5 +1,6 @@
 declare module 'node-etsy-client' {
   type EtsyClientOptions = Partial<{
+    apiUrl: string;
     apiKey: string;
     lang: string;
     shop: string;
@@ -53,5 +54,7 @@ declare module 'node-etsy-client' {
    getProduct(listingId: number, productId: number, options?: object): Promise<string | object>;
 
    getOptions(options: EtsyClientOptions): EtsyClientOptions;
+
+   findAllListingShippingProfileEntries(listingId: number, options?: object): Promise<string | object>;
   }
 }
