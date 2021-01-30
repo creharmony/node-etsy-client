@@ -1,5 +1,5 @@
 # node-etsy-client
-NodeJs Etsy Rest Client
+NodeJs Etsy [ReST API](https://www.etsy.com/developers/documentation) Client
 
 # Quick start
 

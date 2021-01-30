@@ -5,7 +5,7 @@
   "main": "./src/EtsyClient.js",
   "types": "./src/EtsyClient.d.ts",
   "scripts": {
-    "test": "mocha test/*.test.js"
+    "test": "mocha tests/*.test.js"
   },
   "private": false,
   "author": "Boly38 <boly380@gmail.com>",
