@@ -43,14 +43,32 @@ async function doIt() {
 }
 doIt();
 ```
+You could play mocha tests to get more examples (cf. next section).
 
-You could avoid using environment variable by using constructor options: 
+You could avoid using environment variable by using constructor options:
 ```
 var client = new EtsyClient({apiKey:'mSecretHere'});
 ```
 
-You could play mocha tests to get more examples.
-- clone
-- `npm install`
-- setup your test environment (cf. [initEnv.example.sh](./env/initEnv.example.sh))  
-- run mocha tests : `npm run test`
+## How to contribute
+You're not a dev ? just submit an issue (bug, improvements, questions). Or else:
+* Clone
+* Install deps
+* setup your test environment (cf. [initEnv.example.sh](./env/initEnv.example.sh))
+* Then mocha tests
+```
+git clone https://github.com/creharmony/node-etsy-client.git
+cd node-etsy-client
+npm install
+. ./env/initEnv.example.sh
+npm run test
+```
+* you could also fork, feature branch, then submit a pull request.
+
+### Services or activated bots
+
+| badge  | name   | description  |
+|--------|-------|:--------|
+| [![Build Status](https://travis-ci.com/creharmony/node-etsy-client.svg?branch=main)](https://travis-ci.com/creharmony/node-etsy-client) |[Travis-ci](https://travis-ci.com/creharmony/node-etsy-client)|Continuous tests.
+|  |[Houndci](https://houndci.com/)|JavaScript  automated review (configured by `.hound.yml`)|
+| [![Automated Release Notes by gren](https://img.shields.io/badge/%F0%9F%A4%96-release%20notes-00B2EE.svg)](https://github-tools.github.io/github-release-notes/)|[gren](https://github.com/github-tools/github-release-notes)|[Release notes](https://github.com/creharmony/node-etsy-client/releases) automation|
