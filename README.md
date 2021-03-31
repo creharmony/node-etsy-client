@@ -60,6 +60,9 @@ You're not a dev ? just submit an issue (bug, improvements, questions). Or else:
 git clone https://github.com/creharmony/node-etsy-client.git
 cd node-etsy-client
 npm install
+# play test without etsy endpoint
+npm run test
+# play test with etsy endpoint
 . ./env/initEnv.example.sh
 npm run test
 ```
