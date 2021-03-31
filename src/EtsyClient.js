@@ -93,10 +93,28 @@ class EtsyClient {
          const getQueryString = queryString.stringify(this.getOptions(options));
          fetch(`${this.apiUrl}${endpoint}?${getQueryString}`)
            .then(response => EtsyClient._response(response, resolve, reject))
-           .catch(reject);
+           .catch((fetchError) => {
+             var secureError = {};
+             this.secureErrorAttribute(secureError, fetchError, "message");
+             this.secureErrorAttribute(secureError, fetchError, "reason");
+             this.secureErrorAttribute(secureError, fetchError, "type");
+             this.secureErrorAttribute(secureError, fetchError, "errno");
+             this.secureErrorAttribute(secureError, fetchError, "code");
+             reject(secureError);
+           });
      });
   }
 
+  secureErrorAttribute(secureError, sourceError, attribute) {
+    if (!Object.keys(sourceError).includes(attribute)) {
+      return;
+    }
+    secureError[attribute] = this.secureAttributeValue(sourceError[attribute]);
+  }
+
+  secureAttributeValue(value) {
+    return (value === null || value === undefined) ? null : value.replace(new RegExp(this.apiKey,'g'), "**hidden**");
+  }
 
   getOptions(options) {
     var merged = options ? options : {};
