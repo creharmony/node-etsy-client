@@ -35,6 +35,7 @@
   },
   "dependencies": {
     "chai": "^4.2.0",
+    "limiter": "^1.1.5",
     "mocha": "^8.2.1",
     "node-fetch": "^2.6.1",
     "nyc": "^15.1.0",
