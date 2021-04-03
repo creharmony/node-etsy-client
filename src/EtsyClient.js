@@ -1,5 +1,9 @@
 const queryString = require('query-string');
 const fetch = require("node-fetch");
+const RateLimiter = require('limiter').RateLimiter;
+
+const DEFAULT_DRY_MODE = false;// DEBUG // if true, then print fetch onto console instead of calling etsy
+const DEFAULT_RATE_WAIT = true;// rate limite will wait next available query instead of reporting an error immediately
 
 /**
  * this utility class implement ETSY (some) methods documented here:
@@ -13,93 +17,143 @@ class EtsyClient {
     if (!options) {
       options = {};
     }
-    this.apiUrl = options.apiUrl || process.env.ETSY_API_ENDPOINT || 'https://openapi.etsy.com/v2'
-    this.apiKey = options.apiKey || process.env.ETSY_API_KEY;
-    this.shop   = options.shop   || process.env.ETSY_SHOP;
-    this.lang   = options.lang   || process.env.ETSY_LANG;
+    this.apiUrl = "apiUrl" in options ? options.apiUrl : (process.env.ETSY_API_ENDPOINT || 'https://openapi.etsy.com/v2');
+    this._assumeApiUrl();
+    this.apiKey = "apiKey" in options ? options.apiKey : process.env.ETSY_API_KEY;
     this._assumeApiKey();
+    this.shop   = "shop" in options ? options.shop : process.env.ETSY_SHOP;
+    this.lang   = "lang" in options ? options.lang : process.env.ETSY_LANG;
+    // configure rate limit on etsy call : max <etsyRateMaxQueries> per <etsyRateWindowSizeMs> ms
+    // on limit reach, wait if <etsyRateWait>, else throw an error immediately. cf. https://github.com/jhurliman/node-rate-limiter
+    // Etsy rate limit doc (10/sec) : https://www.etsy.com/developers/documentation/getting_started/api_basics#section_rate_limiting
+    this.etsyRateWindowSizeMs = "etsyRateWindowSizeMs" in options ? options.etsyRateWindowSizeMs : (process.env.ETSY_RATE_WINDOWS_SIZE_MS  || 1000);
+    this.etsyRateMaxQueries   = "etsyRateMaxQueries" in options ? options.etsyRateMaxQueries : (process.env.ETSY_RATE_MAX_QUERIES || null);
+    this.etsyRateWait         = "etsyRateWait" in options ? options.etsyRateWait : ("true" === process.env.ETSY_RATE_WAIT || true);
+    this.dryMode              = "dryMode" in options ? options.dryMode : ("true" === process.env.ETSY_DRY_MODE || DEFAULT_DRY_MODE);
+    this.initRateLimiter();
+    // DEBUG // console.debug(`EtsyClient - apiUrl:${this.apiUrl} - dryMode:${this.dryMode} ${this.limiterDesc}`);
+  }
+
+  initRateLimiter() {
+    this.limiter = this.etsyRateWindowSizeMs === null || this.etsyRateMaxQueries === null ? null :
+      new RateLimiter(this.etsyRateMaxQueries, this.etsyRateWindowSizeMs, (!this.etsyRateWait));
+    this.limiterDesc = (this.limiter === null) ? "" : `rate limit:${this.etsyRateMaxQueries} query / ${this.etsyRateWindowSizeMs}ms` +
+      !this.etsyRateWait ? "throwing error on limit reached":"";
+  }
+
+  isRateLimitEnabled() {
+    return this.limiter !== null;
   }
 
   // https://www.etsy.com/developers/documentation/reference/shop#method_findallshops
   findAllShops(options) {
-    return this.etsyApiFetch(`/shops`, options);
+    return this.limitedEtsyApiFetch(`/shops`, options);
   }
 
   // https://www.etsy.com/developers/documentation/reference/shop#method_getshop
   getShop(options) {
      this._assumeShop();
-     return this.etsyApiFetch(`/shops/${this.shop}`, options);
+     return this.limitedEtsyApiFetch(`/shops/${this.shop}`, options);
   }
 
   // https://www.etsy.com/developers/documentation/reference/shopsection#method_findallshopsections
   findAllShopSections(listingId, options) {
      this._assumeShop();
-     return this.etsyApiFetch(`/shops/${this.shop}/sections`, options);
+     return this.limitedEtsyApiFetch(`/shops/${this.shop}/sections`, options);
   }
 
   // https://www.etsy.com/developers/documentation/reference/listing#method_findallshoplistingsactive
   findAllShopListingsActive(options) {
      this._assumeShop();
-     return this.etsyApiFetch(`/shops/${this.shop}/listings/active`, options);
+     return this.limitedEtsyApiFetch(`/shops/${this.shop}/listings/active`, options);
   }
 
   // https://www.etsy.com/developers/documentation/reference/listing#method_getlisting
   getListing(listingId, options) {
      this._assumeField('listingId', listingId);
-     return this.etsyApiFetch(`/listings/${listingId}`, options);
+     return this.limitedEtsyApiFetch(`/listings/${listingId}`, options);
   }
 
   // https://www.etsy.com/developers/documentation/reference/listingvariationimage#method_getvariationimages
   getVariationImages(listingId, options) {
      this._assumeField('listingId', listingId);
-     return this.etsyApiFetch(`/listings/${listingId}/variation-images`, options);
+     return this.limitedEtsyApiFetch(`/listings/${listingId}/variation-images`, options);
   }
 
   // https://www.etsy.com/developers/documentation/reference/listingimage#method_findalllistingimages
   findAllListingImages(listingId, options) {
      this._assumeField('listingId', listingId);
-     return this.etsyApiFetch(`/listings/${listingId}/images`, options);
+     return this.limitedEtsyApiFetch(`/listings/${listingId}/images`, options);
   }
 
   // https://www.etsy.com/developers/documentation/reference/listinginventory
   getInventory(listingId, options) {
      this._assumeField('listingId', listingId);
-     return this.etsyApiFetch(`/listings/${listingId}/inventory`, options);
+     return this.limitedEtsyApiFetch(`/listings/${listingId}/inventory`, options);
   }
 
   // https://www.etsy.com/developers/documentation/reference/propertyvalue#method_getattribute
   getAttributes(listingId, options) {
      this._assumeField('listingId', listingId);
-     return this.etsyApiFetch(`/listings/${listingId}/attributes`, options);
+     return this.limitedEtsyApiFetch(`/listings/${listingId}/attributes`, options);
   }
 
   // https://www.etsy.com/developers/documentation/reference/listingproduct#method_getproduct
   getProduct(listingId, productId, options) {
      this._assumeField('listingId', listingId);
      this._assumeField('productId', productId);
-     return this.etsyApiFetch(`/listings/${listingId}/products/${productId}`, options);
+     return this.limitedEtsyApiFetch(`/listings/${listingId}/products/${productId}`, options);
   }
-
 
   // https://www.etsy.com/developers/documentation/reference/shippinginfo#method_findalllistingshippingprofileentries
   findAllListingShippingProfileEntries(listingId, options) {
      this._assumeField('listingId', listingId);
-     return this.etsyApiFetch(`/listings/${listingId}/shipping/info`, options);
+     return this.limitedEtsyApiFetch(`/listings/${listingId}/shipping/info`, options);
   }
 
-  etsyApiFetch(endpoint, options) {
+  limitedEtsyApiFetch(endpoint, options) {
+    var client = this;
+    if (!client.isRateLimitEnabled()) {
+      return client.safeEtsyApiFetch(endpoint, options);
+    } else {
+      return new Promise((resolve, reject) => {
+        client.asyncRemoveTokens(1)
+          .then((remainingRequests)=> {
+            client.safeEtsyApiFetch(endpoint, options)
+                .then(resolve).catch(reject);
+          })
+          .catch(reject)
+      });
+    }
+  }
+
+  asyncRemoveTokens(count) {// hurliman/node-rate-limiter/issues/63 by sunknudsen
+    var client = this;
+    return new Promise((resolve, reject) => {
+      client.limiter.removeTokens(count, (error, remainingRequests) => {
+        if (remainingRequests < 0 && !client.etsyRateWait) {
+          reject("rate limit reached");
+        }
+        if (error) return reject(error)
+        resolve(remainingRequests)
+      })
+    })
+  }
+
+  safeEtsyApiFetch(endpoint, options) {
      this._assumeField('endpoint', endpoint);
+     var client = this;
      return new Promise((resolve, reject) => {
-         const getQueryString = queryString.stringify(this.getOptions(options));
-         fetch(`${this.apiUrl}${endpoint}?${getQueryString}`)
+         const getQueryString = queryString.stringify(client.getOptions(options));
+         client.nodeFetch(`${client.apiUrl}${endpoint}?${getQueryString}`)
            .then(response => EtsyClient._response(response, resolve, reject))
            .catch((fetchError) => {
              var secureError = {};
-             this.secureErrorAttribute(secureError, fetchError, "message");
-             this.secureErrorAttribute(secureError, fetchError, "reason");
-             this.secureErrorAttribute(secureError, fetchError, "type");
-             this.secureErrorAttribute(secureError, fetchError, "errno");
-             this.secureErrorAttribute(secureError, fetchError, "code");
+             client.secureErrorAttribute(secureError, fetchError, "message");
+             client.secureErrorAttribute(secureError, fetchError, "reason");
+             client.secureErrorAttribute(secureError, fetchError, "type");
+             client.secureErrorAttribute(secureError, fetchError, "errno");
+             client.secureErrorAttribute(secureError, fetchError, "code");
              reject(secureError);
            });
      });
@@ -125,8 +179,24 @@ class EtsyClient {
     return merged;
   }
 
+  dryFetch(endpoint) {
+    const response = {};
+    response.ok = true;
+    response.text = function(){ return JSON.stringify({endpoint});};
+    console.log(`[dry_fetch] ${endpoint}`);
+    return Promise.resolve(response);
+  }
+
+  nodeFetch(endpoint) {
+    if (this.dryMode) {
+      return this.dryFetch(endpoint);
+    }
+    return fetch(endpoint);
+  }
+
   _assumeShop() { if (!this.shop) { throw "shop is not defined";  } }
-  _assumeApiKey() { if (!this.apiKey) { throw "apiKey is required. You must set ETSY_API_KEY environment variable.";  } }
+  _assumeApiUrl() { if (!this.apiUrl) { throw "apiUrl is required. ie. set ETSY_API_ENDPOINT environment variable.";  } }
+  _assumeApiKey() { if (!this.apiKey) { throw "apiKey is required. ie. set ETSY_API_KEY environment variable.";  } }
   _assumeField(fieldName, fieldValue) { if (!fieldValue) { throw fieldName + " is required";  } }
 
   static _response(response, resolve, reject) {
