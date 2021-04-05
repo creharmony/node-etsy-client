@@ -6,6 +6,7 @@
   "types": "./src/EtsyClient.d.ts",
   "scripts": {
     "test": "mocha tests/*.test.js",
+    "longTest": "set ETSY_LONG_TEST=1&& mocha --timeout 120000 tests/unauthenticated_rate.test.js",
     "cover": "nyc --reporter text --reporter cobertura --reporter html --reporter=lcov --lines 66 mocha --exit --unhandled-rejections=strict tests/*.test.js",
     "ci-test": "echo linux ci-test&& nyc --reporter text --reporter cobertura --reporter html --reporter=lcov --lines 66 mocha --exit --unhandled-rejections=strict tests/*.test.js --timeout 5000"
   },
@@ -40,6 +41,7 @@
     "node-fetch": "^2.6.1",
     "nyc": "^15.1.0",
     "query-string": "^6.13.7",
+    "susi-rali": "0.0.1",
     "winston": "^3.3.3"
   },
   "jshintConfig": {
