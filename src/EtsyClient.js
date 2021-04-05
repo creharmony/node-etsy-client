@@ -36,7 +36,7 @@ class EtsyClient {
       new SusiRali({
           windowsMs:this.etsyRateWindowSizeMs,
           maxQueryPerWindow:this.etsyRateMaxQueries,
-          debugEnabled: true
+          debugEnabled: false
       });
     this.limiterDesc = (!this.isRateLimitEnabled()) ? "" : `Rate limit of ${this.etsyRateMaxQueries} queries per ${this.etsyRateWindowSizeMs}ms`;
   }
