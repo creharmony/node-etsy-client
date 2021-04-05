@@ -65,7 +65,6 @@ else try to retrieve related environment variable, or else apply default value.
 - `lang`   : Etsy language - *optional* (or env.`ETSY_LANG`) without default value. Example: `fr`
 - `etsyRateWindowSizeMs` : Rate limit windows size in milliseconds - *optional* (or env.`ETSY_RATE_WINDOWS_SIZE_MS`) with default value: `1000`
 - `etsyRateMaxQueries`   : Rate limit max query per windows size - *optional* (or env.`ETSY_RATE_MAX_QUERIES`) without default value
-- `etsyRateWait`         : On limit reached, should wait for next slot (instead of throwing error) - *optional* (or env.`ETSY_RATE_WAIT`) with default value: `true`
 - `dryMode`              : print call instead of making real etsy call - *optional* (or env.`ETSY_DRY_MODE`) with default value: `false`
 
 Note about rate limit options:
@@ -74,15 +73,13 @@ Rate limit is enabled if and only if `etsyRateWindowSizeMs` and `etsyRateMaxQuer
 
 This will configure rate limit on etsy call : max `etsyRateMaxQueries` per `etsyRateWindowSizeMs`ms.
 
-On limit reached, if `etsyRateWait`, then wait, else throw an error immediately. 
-
-For more details, cf. [node-rate-limiter](https://github.com/jhurliman/node-rate-limiter)
+For more details, cf. [susi-rali](https://github.com/creharmony/susi-rali)
 
 ### Rate limit
 According to [their documentation](https://www.etsy.com/developers/documentation/getting_started/api_basics#section_rate_limiting),
 Etsy restricts number of call to 10 per second (and 10k per day).
 
-In order to never reach this (second windows) rate limit, node-etsy-client rely on [node-rate-limiter](https://github.com/jhurliman/node-rate-limiter) 
+In order to never reach this (second windows) rate limit, node-etsy-client rely on [susi-rali](https://github.com/creharmony/susi-rali)
 and offer an option to rate limit client calls.
 
 To apply rate limit of 10 query per seconds (with wait on unavailable slot),

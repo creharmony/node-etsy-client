@@ -1,9 +1,8 @@
 const queryString = require('query-string');
 const fetch = require("node-fetch");
-const RateLimiter = require('limiter').RateLimiter;
+const SusiRali = require("susi-rali");
 
 const DEFAULT_DRY_MODE = false;// DEBUG // if true, then print fetch onto console instead of calling etsy
-const DEFAULT_RATE_WAIT = true;// rate limite will wait next available query instead of reporting an error immediately
 
 /**
  * this utility class implement ETSY (some) methods documented here:
@@ -24,21 +23,22 @@ class EtsyClient {
     this.shop   = "shop" in options ? options.shop : process.env.ETSY_SHOP;
     this.lang   = "lang" in options ? options.lang : process.env.ETSY_LANG;
     // configure rate limit on etsy call : max <etsyRateMaxQueries> per <etsyRateWindowSizeMs> ms
-    // on limit reach, wait if <etsyRateWait>, else throw an error immediately. cf. https://github.com/jhurliman/node-rate-limiter
     // Etsy rate limit doc (10/sec) : https://www.etsy.com/developers/documentation/getting_started/api_basics#section_rate_limiting
     this.etsyRateWindowSizeMs = "etsyRateWindowSizeMs" in options ? options.etsyRateWindowSizeMs : (process.env.ETSY_RATE_WINDOWS_SIZE_MS  || 1000);
     this.etsyRateMaxQueries   = "etsyRateMaxQueries" in options ? options.etsyRateMaxQueries : (process.env.ETSY_RATE_MAX_QUERIES || null);
-    this.etsyRateWait         = "etsyRateWait" in options ? options.etsyRateWait : ("true" === process.env.ETSY_RATE_WAIT || true);
     this.dryMode              = "dryMode" in options ? options.dryMode : ("true" === process.env.ETSY_DRY_MODE || DEFAULT_DRY_MODE);
     this.initRateLimiter();
-    // DEBUG // console.debug(`EtsyClient - apiUrl:${this.apiUrl} - dryMode:${this.dryMode} ${this.limiterDesc}`);
+    // DEBUG // console.debug(`EtsyClient - apiUrl:${this.apiUrl} - dryMode:${this.dryMode} - ${this.limiterDesc}`);
   }
 
   initRateLimiter() {
-    this.limiter = this.etsyRateWindowSizeMs === null || this.etsyRateMaxQueries === null ? null :
-      new RateLimiter(this.etsyRateMaxQueries, this.etsyRateWindowSizeMs, (!this.etsyRateWait));
-    this.limiterDesc = (this.limiter === null) ? "" : `rate limit:${this.etsyRateMaxQueries} query / ${this.etsyRateWindowSizeMs}ms` +
-      !this.etsyRateWait ? "throwing error on limit reached":"";
+    this.limiter = (this.etsyRateWindowSizeMs === null || this.etsyRateMaxQueries === null) ? null :
+      new SusiRali({
+          windowsMs:this.etsyRateWindowSizeMs,
+          maxQueryPerWindow:this.etsyRateMaxQueries,
+          debugEnabled: true
+      });
+    this.limiterDesc = (!this.isRateLimitEnabled()) ? "" : `Rate limit of ${this.etsyRateMaxQueries} queries per ${this.etsyRateWindowSizeMs}ms`;
   }
 
   isRateLimitEnabled() {
@@ -116,28 +116,11 @@ class EtsyClient {
     if (!client.isRateLimitEnabled()) {
       return client.safeEtsyApiFetch(endpoint, options);
     } else {
-      return new Promise((resolve, reject) => {
-        client.asyncRemoveTokens(1)
-          .then((remainingRequests)=> {
-            client.safeEtsyApiFetch(endpoint, options)
-                .then(resolve).catch(reject);
-          })
-          .catch(reject)
+      return new Promise(async function(resolve, reject) {
+        await client.limiter.limitedCall(() => client.safeEtsyApiFetch(endpoint, options))
+                  .then(resolve).catch(reject);
       });
     }
-  }
-
-  asyncRemoveTokens(count) {// hurliman/node-rate-limiter/issues/63 by sunknudsen
-    var client = this;
-    return new Promise((resolve, reject) => {
-      client.limiter.removeTokens(count, (error, remainingRequests) => {
-        if (remainingRequests < 0 && !client.etsyRateWait) {
-          reject("rate limit reached");
-        }
-        if (error) return reject(error)
-        resolve(remainingRequests)
-      })
-    })
   }
 
   safeEtsyApiFetch(endpoint, options) {
