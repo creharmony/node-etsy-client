@@ -112,6 +112,7 @@ npm run test
 | badge  | name   | description  |
 |--------|-------|:--------|
 | ![CI/CD](https://github.com/creharmony/node-etsy-client/workflows/etsy_client_ci/badge.svg) |Github actions|Continuous tests.
+| [![scheduled npm audit](https://github.com/creharmony/node-etsy-client/actions/workflows/audit.yml/badge.svg)](https://github.com/creharmony/node-etsy-client/actions/workflows/audit.yml) |Github actions|Continuous vulnerability audit.
 |  |[Houndci](https://houndci.com/)|JavaScript  automated review (configured by `.hound.yml`)|
 | [![Automated Release Notes by gren](https://img.shields.io/badge/%F0%9F%A4%96-release%20notes-00B2EE.svg)](https://github-tools.github.io/github-release-notes/)|[gren](https://github.com/github-tools/github-release-notes)|[Release notes](https://github.com/creharmony/node-etsy-client/releases) automation|
 <!-- travis disabled
