@@ -30,7 +30,8 @@
   "copyright": {
     "title": "node-etsy-client",
     "years": [
-      2020
+      2020,
+      2021
     ],
     "author": "Brice Vandeputte"
   },
@@ -40,13 +41,10 @@
     "node-fetch": "^2.6.1",
     "nyc": "^15.1.0",
     "query-string": "^6.14.1",
-    "susi-rali": "0.0.2",
+    "susi-rali": "0.0.3",
     "winston": "^3.3.3"
   },
   "jshintConfig": {
     "esversion": 6
-  },
-  "engines": {
-    "node": "12"
   }
 }
