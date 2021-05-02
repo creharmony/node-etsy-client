@@ -96,10 +96,6 @@ if (!process.env.ETSY_API_KEY) {
       expect(duration).to.be.gt(1000);
     });
 
-    it("should dry test cases with rate limit of 10 per seconds without wait", async function() {
-      await api_test_cases({dryMode:true, etsyRateMaxQueries:10, etsyRateWait:false});
-    });
-
   });
 }
 
