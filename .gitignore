@@ -106,8 +106,6 @@ dist
 # IntelliJ
 *.iml
 
-package-lock.json
-
 # drafts
 __*/
 *.dontpush.*
