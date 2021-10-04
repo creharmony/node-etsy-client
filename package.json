@@ -1,6 +1,6 @@
 {
   "name": "node-etsy-client",
-  "version": "0.7.2",
+  "version": "0.7.3",
   "description": "node-etsy-client",
   "main": "./src/EtsyClient.js",
   "types": "./src/EtsyClient.d.ts",
@@ -29,7 +29,9 @@
   ],
   "copyright": {
     "title": "node-etsy-client",
-    "years": [2021],
+    "years": [
+      2021
+    ],
     "author": "Brice Vandeputte"
   },
   "dependencies": {
