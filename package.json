@@ -11,7 +11,7 @@
     "ci-test": "echo linux ci-test&& nyc --reporter text --reporter cobertura --reporter html --reporter=lcov --lines 66 mocha --exit --unhandled-rejections=strict tests/*.test.js --timeout 5000"
   },
   "private": false,
-  "author": "Boly38 <boly380@gmail.com>",
+  "author": "Boly38 <boly38@gmail.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -37,7 +37,7 @@
   "dependencies": {
     "node-fetch": "^2.6.5",
     "query-string": "^7.0.1",
-    "susi-rali": "0.1.3",
+    "susi-rali": "0.1.4",
     "winston": "^3.3.3"
   },
   "devDependencies": {
