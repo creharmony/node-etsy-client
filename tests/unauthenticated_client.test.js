@@ -1,6 +1,9 @@
-const assert = require('assert').strict;
-const expect = require('chai').expect
-const EtsyClient = require('../src/EtsyClient.js');
+import EtsyClient from '../src/EtsyClient.js';
+
+import chai from 'chai';
+const should = chai.should;
+const expect = chai.expect;
+should();
 
 const FAKE_API_KEY = "ultraSecretRightHere";
 

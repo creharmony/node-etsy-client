@@ -1,13 +1,13 @@
-const assert = require('assert').strict;
-const chai = require('chai');
-const expect = chai.expect
-chai.should();
+import winston from 'winston';
+import EtsyClient from '../src/EtsyClient.js';
 
-const winston = require('winston');
+import chai from 'chai';
+const should = chai.should;
+const expect = chai.expect;
+should();
+
 const winstonTransports = [ new winston.transports.Console({ format: winston.format.simple() }) ];
 const logger = winston.createLogger({ transports: winstonTransports });
-
-const EtsyClient = require('../src/EtsyClient.js');
 const productsLimit = 5;
 const imagesLimit = 5;
 
