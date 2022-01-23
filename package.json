@@ -4,7 +4,9 @@
   "description": "node-etsy-client",
   "main": "./src/EtsyClient.js",
   "types": "./src/EtsyClient.d.ts",
+  "type": "module",
   "scripts": {
+    "preinstall": "npm-force-resolutions",
     "test": "mocha tests/*.test.js",
     "longTest": "set ETSY_LONG_TEST=1&& mocha --timeout 120000 tests/unauthenticated_rate.test.js",
     "cover": "nyc --reporter text --reporter cobertura --reporter html --reporter=lcov --lines 66 mocha --exit --unhandled-rejections=strict tests/*.test.js",
@@ -30,20 +32,25 @@
   "copyright": {
     "title": "node-etsy-client",
     "years": [
-      2021
+      2021,
+      2022
     ],
     "author": "Brice Vandeputte"
   },
   "dependencies": {
-    "node-fetch": "^2.6.5",
+    "node-fetch": "^3.2.0",
     "query-string": "^7.0.1",
     "susi-rali": "0.1.4",
     "winston": "^3.3.3"
   },
   "devDependencies": {
     "chai": "^4.3.4",
-    "mocha": "^9.1.2",
+    "mocha": "^9.1.4",
+    "npm-force-resolutions": "^0.0.10",
     "nyc": "^15.1.0"
+  },
+  "resolutions": {
+    "nanoid": "3.2.0"
   },
   "jshintConfig": {
     "esversion": 6

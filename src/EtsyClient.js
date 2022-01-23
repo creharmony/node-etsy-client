@@ -1,6 +1,6 @@
-const queryString = require('query-string');
-const fetch = require("node-fetch");
-const SusiRali = require("susi-rali");
+import queryString from 'query-string';
+import fetch from 'node-fetch';
+import SusiRali from 'susi-rali';
 
 const DEFAULT_DRY_MODE = false;// DEBUG // if true, then print fetch onto console instead of calling etsy
 
@@ -222,4 +222,4 @@ class EtsyClient {
     })();
   }
 }
-module.exports = EtsyClient
+export default EtsyClient;
