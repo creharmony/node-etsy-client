@@ -156,7 +156,7 @@ class EtsyClient {
   getOptions(options) {
     var merged = options ? options : {};
     merged['api_key'] = this.apiKey;
-    if (this.lang != null) {
+    if (this.lang != null && !("language" in merged)) {
       merged['language'] = this.lang;
     }
     return merged;
