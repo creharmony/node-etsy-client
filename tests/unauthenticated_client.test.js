@@ -27,19 +27,14 @@ if (!process.env.ETSY_API_KEY) {
     });
 
     // 11 test cases (>10)
-    async function api_test_cases(etsyExtraOptions) {
-      var etsyOptions = etsyExtraOptions;
-      const apiKey = FAKE_API_KEY;
-      const apiUrl = "https://IAmNotEtsyEndpoint.com";
-      const shop = "MyShop";
-      const lang = "fr";
+    async function api_test_cases(etsyExtraOptions = {}) {
+      const etsyOptions = enrichOptionsWithTestConfiguration(etsyExtraOptions);
+      const apiUrl = etsyOptions.apiUrl;
+      const apiKey = etsyOptions.apiKey;
+      const lang = etsyOptions.lang;
+      const shop = etsyOptions.shop;
       const listingId = "12345665432";
       const productId = "34555555555";
-
-      etsyOptions.apiKey = apiKey;
-      etsyOptions.apiUrl = apiUrl;
-      etsyOptions.shop = shop;
-      etsyOptions.lang = lang;
 
       const client = new EtsyClient(etsyOptions);
       const expectedEndpoint = (path) => `${apiUrl}${path}?api_key=${apiKey}&language=${lang}`;
@@ -99,10 +94,46 @@ if (!process.env.ETSY_API_KEY) {
       expect(duration).to.be.gt(1000);
     });
 
+    it("should fetch with default client lang or query lang if any", async function() {
+      const etsyOptions = enrichOptionsWithTestConfiguration({dryMode:true});
+      const client = new EtsyClient(etsyOptions);
+
+      const listingId = "12345665432";
+      const apiUrl = etsyOptions.apiUrl;
+      const apiKey = etsyOptions.apiKey;
+      const lang = etsyOptions.lang;
+      const expectedFrEndpoint = (path) => `${apiUrl}${path}?api_key=${apiKey}&language=${lang}`;
+      const expectedEnEndpoint = (path) => `${apiUrl}${path}?api_key=${apiKey}&language=en`;
+
+      //~ language is defined in client options
+
+      const getListingFr = await client.getListing(listingId).catch(_expectNoError);
+      expect(getListingFr.endpoint).to.be.eql(expectedFrEndpoint(`/listings/${listingId}`));
+
+      const findAllListingImagesFr = await client.findAllListingImages(listingId).catch(_expectNoError);
+      expect(findAllListingImagesFr.endpoint).to.be.eql(expectedFrEndpoint(`/listings/${listingId}/images`));
+
+      //~ language is defined in query-specific options
+
+      const getListingEn = await client.getListing(listingId, {"language":"en"}).catch(_expectNoError);
+      expect(getListingEn.endpoint).to.be.eql(expectedEnEndpoint(`/listings/${listingId}`));
+
+      const findAllListingImagesEn = await client.findAllListingImages(listingId, {"language":"en"}).catch(_expectNoError);
+      expect(findAllListingImagesEn.endpoint).to.be.eql(expectedEnEndpoint(`/listings/${listingId}/images`));
+    });
+
   });
 }
 
+function enrichOptionsWithTestConfiguration(options) {
+  options.apiKey = FAKE_API_KEY;
+  options.apiUrl = "https://IAmNotEtsyEndpoint.com";
+  options.shop = "MyShop";
+  options.lang = "fr";
+  return options;
+}
+
 function _expectNoError(err) {
-  console.trace(err)
+  console.trace(err instanceof String ? err : JSON.stringify(err))
   expect.fail(err);
 }
