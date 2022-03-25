@@ -6,7 +6,7 @@ declare module 'node-etsy-client' {
     shop: string;
   }>
 
-  export default class EtsyClient {
+  export default class EtsyClientV2 {
     constructor(options?: EtsyClientOptions);
 
     findAllShops(options?: EtsyClientOptions): Promise<string | object>;

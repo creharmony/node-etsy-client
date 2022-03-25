@@ -6,16 +6,21 @@ NodeJs Etsy [ReST API](https://www.etsy.com/developers/documentation) Client.
 
 - compatible with JavaScript and TypeScript.
 
+In addition, this library provide an extra [OAuth2Service](./src/OAuth2Service.js) service class useful to manage oAuth2 workflow: to build connect url, handle callback, and manage refresh token.
+
+Have a look into [oauth.js sample](src/sample/oauth.js) to make some oAuth2 manual test.
+
+## EtsyClientV3 - BETA
 Features
 
 - findAllShops
 - getShop
 - findAllShopSections
-- findAllShopListingsActive 
+- findAllShopListingsActive
 - getListing
 - getVariationImages
 - findAllListingImages
-- getInventory 
+- getInventory
 - getAttributes
 - getProduct
 - findAllListingShippingProfileEntries
@@ -35,10 +40,10 @@ npm install node-etsy-client
 
 then let's go, here is a `sample.js`:
 ```
-const EtsyClient = require('node-etsy-client')
+const EtsyClientV2 = require('node-etsy-client')
 async function doIt() {
-  var client = new EtsyClient();
-  var shops = await client.getShops({'limit':10});
+  var client = new EtsyClientV2();
+  var shops = await client.getShops({'shopd_name':'mony', limit':10});
   console.log(shops);
 }
 doIt();
@@ -47,21 +52,22 @@ You could play mocha tests to get more examples (cf. next section).
 
 You could avoid using environment variable by using constructor options:
 ```
-var client = new EtsyClient({apiKey:'mSecretHere'});
+var client = new EtsyClientV3({apiKey:'mSecretHere'});
 ```
 
 ## Advanced usage
 
 
 ### Etsy client options
-This section describes EtsyClient available options.
+This section describes EtsyClientV2 available options.
 
 Note about options precedence: first take option value from constructor if any, or
 else try to retrieve related environment variable, or else apply default value.
 
-- `apiUrl` : Etsy api endpoint - **required** (or env.`ETSY_API_ENDPOINT`) default value is `https://openapi.etsy.com/v2`.
+- `apiUrl` : Etsy api endpoint - **required** (or env.`ETSY_API_ENDPOINT`) default value is (v2)`https://openapi.etsy.com/v2` / (v3)`https://openapi.etsy.com/v3`.
 - `apiKey` : Etsy api key - **required** (or env.`ETSY_API_KEY`) without default value. Ask one from [Etsy portal](https://www.etsy.com/developers/documentation/getting_started/register)
-- `shop`   : Etsy shop name - *optional* (or env.`ETSY_SHOP`) without default value.
+- (v2)`shop`   : Etsy shop name - *optional* (or env.`ETSY_SHOP`) without default value.
+- (v3)`shopId` : Etsy shop id - *optional* (or env.`ETSY_SHOP_ID`) without default value.
 - `lang`   : Etsy language - *optional* (or env.`ETSY_LANG`) without default value. Example: `fr`
 - `etsyRateWindowSizeMs` : Rate limit windows size in milliseconds - *optional* (or env.`ETSY_RATE_WINDOWS_SIZE_MS`) with default value: `1000`
 - `etsyRateMaxQueries`   : Rate limit max query per windows size - *optional* (or env.`ETSY_RATE_MAX_QUERIES`) without default value
@@ -86,8 +92,41 @@ To apply rate limit of 10 query per seconds (with wait on unavailable slot),
 add `etsyRateMaxQueries` option:
 
 ```
-var client = new EtsyClient({apiKey:'mSecretHere', etsyRateMaxQueries:10});
+var client = new EtsyClientV2({apiKey:'mSecretHere', etsyRateMaxQueries:10});
 ```
+
+## ETSY API versions
+
+| node-etsy-client<br/>version |   Classes    | Etsy API  |
+|------------------------------|:------------:|:-----------------|
+| &gt;= 1.0.0                  | EtsyClientV3 |               V3 |
+| &gt;= 1.0.0                  | EtsyClientV2 |               V2 |
+| 0.x.y                        |  EtsyClient  |               V2 |
+
+Starting from 1.0.0-beta node-etsy-client provide an `EtsyClientV3` utility class dedicated to etsy 3 api calls.
+
+For previous version < 1.0.0 (eg. `0.8.2`) node-etsy-client was providing only one utility class called `EtsyClient` which was dedicated to etsy v2 api calls. This class has been renamed into `EtsyClientV2`.
+
+Etsy v2 API will remain unavailable for a given amount of time in 2022 :
+
+- **WARNING** : v2 API will be discontinued : cf Etsy [migration page for more details](https://developers.etsy.com/documentation/migration/index#launch-stages)
+
+
+### EtsyClientV2 (deprecated)
+
+
+Features
+
+- findAllShops(shop_name)
+- getShop
+- getShopSections
+- findAllActiveListingsByShop
+- getListing
+- getListingVariationImages
+- getListingImages
+- getListingProperty
+
+
 
 ## How to contribute
 You're not a dev ? just submit an issue (bug, improvements, questions). Or else:

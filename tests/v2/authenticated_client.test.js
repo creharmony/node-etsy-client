@@ -1,5 +1,5 @@
 import winston from 'winston';
-import EtsyClient from '../src/EtsyClient.js';
+import EtsyClientV2 from '../../src/EtsyClientV2.js';
 
 import chai from 'chai';
 const should = chai.should;
@@ -38,7 +38,7 @@ if (apiKey) {
       testConfig.shop = shopName;
     }
 
-    client = new EtsyClient(testConfig);
+    client = new EtsyClientV2(testConfig);
 
     console.info("testPlan:", testPlan);
   });
@@ -47,7 +47,7 @@ if (apiKey) {
 
   });
 
-  describe("Test Authenticated EtsyClient", function() {
+  describe("Test Authenticated EtsyClientV2", function() {
 
     if(testPlan.shops) {
       it("should find etsy shops", async function() {
