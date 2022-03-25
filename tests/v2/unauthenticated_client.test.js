@@ -1,4 +1,4 @@
-import EtsyClient from '../src/EtsyClient.js';
+import EtsyClientV2 from '../../src/EtsyClientV2.js';
 
 import chai from 'chai';
 const should = chai.should;
@@ -9,14 +9,14 @@ const FAKE_API_KEY = "ultraSecretRightHere";
 
 if (!process.env.ETSY_API_KEY) {
 
-  describe("Test Unauthenticated EtsyClient", function() {
+  describe("Test Unauthenticated EtsyClientV2", function() {
 
     it("should not work without api key", async function() {
-        expect(function () { new EtsyClient() } ).to.throw('apiKey is required');
+        expect(function () { new EtsyClientV2() } ).to.throw('apiKey is required');
     });
 
     it("should not report api key in error case", async function() {
-      const client = new EtsyClient({
+      const client = new EtsyClientV2({
         apiKey:FAKE_API_KEY,
         apiUrl:"https://IAmNotEtsyEndpoint.com"
       });
@@ -36,7 +36,7 @@ if (!process.env.ETSY_API_KEY) {
       const listingId = "12345665432";
       const productId = "34555555555";
 
-      const client = new EtsyClient(etsyOptions);
+      const client = new EtsyClientV2(etsyOptions);
       const expectedEndpoint = (path) => `${apiUrl}${path}?api_key=${apiKey}&language=${lang}`;
 
       const findAllShops = await client.findAllShops().catch(_expectNoError);
@@ -96,7 +96,7 @@ if (!process.env.ETSY_API_KEY) {
 
     it("should fetch with default client lang or query lang if any", async function() {
       const etsyOptions = enrichOptionsWithTestConfiguration({dryMode:true});
-      const client = new EtsyClient(etsyOptions);
+      const client = new EtsyClientV2(etsyOptions);
 
       const listingId = "12345665432";
       const apiUrl = etsyOptions.apiUrl;
