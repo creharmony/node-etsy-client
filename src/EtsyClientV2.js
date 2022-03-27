@@ -57,7 +57,7 @@ class EtsyClientV2 {
   }
 
   // https://www.etsy.com/developers/documentation/reference/shopsection#method_findallshopsections
-  findAllShopSections(listingId, options) {
+  findAllShopSections(options) {
      this._assumeShop();
      return this.limitedEtsyApiFetch(`/shops/${this.shop}/sections`, options);
   }

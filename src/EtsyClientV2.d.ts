@@ -13,7 +13,7 @@ declare module 'node-etsy-client' {
 
     getShop(options?: EtsyClientOptions): Promise<string | object>;
 
-    findAllShopSections(listingId: number, npoptions?: EtsyClientOptions): Promise<string | object>;
+    findAllShopSections(npoptions?: EtsyClientOptions): Promise<string | object>;
    /**
     * Finds all active Listings associated with a Shop.
     * 
