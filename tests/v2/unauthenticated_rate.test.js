@@ -3,7 +3,7 @@ import EtsyClientV2 from '../../src/EtsyClientV2.js';
 import chai from 'chai';
 const should = chai.should;
 const expect = chai.expect;
-should();
+chai.should();
 
 const FAKE_API_KEY = "ultraSecretRightHere";
 

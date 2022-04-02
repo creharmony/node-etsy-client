@@ -161,13 +161,16 @@ class EtsyClientV3 {
          delete queryOptions.accessToken
          const getQueryString = queryString.stringify(queryOptions);
          const fetchEndpoint = `${client.apiUrl}${endpoint}?${getQueryString}`;
-         EtsyClientV3.debug && console.log(`fetch ${fetchEndpoint} headers:${JSON.stringify(headers)}`);
+         EtsyClientV3.debug && console.log(`fetch ${fetchEndpoint} headers: **hidden**`);
          client.nodeFetch(fetchEndpoint, headers)
            .then(response => EtsyClientV3._response(response, resolve, reject))
            .catch(fetchError => {
              EtsyClientV3.debug && console.log(`fetch err ${JSON.stringify(fetchError)}`);
              var secureError = {};
              client.secureErrorAttribute(secureError, fetchError, "error");
+             client.secureErrorAttribute(secureError, fetchError, "type");
+             client.secureErrorAttribute(secureError, fetchError, "errno");
+             client.secureErrorAttribute(secureError, fetchError, "code");
              reject(secureError);
            });
      });

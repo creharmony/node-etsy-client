@@ -44,7 +44,9 @@ jobs:
       run: npm install
 
     - name: Run ci-tests with code coverage
-      run: npm run ci-test
+      run: |
+        npm i -g c8
+        npm run ci-test
 
     - name: Report coverage to the PR
       continue-on-error: true
