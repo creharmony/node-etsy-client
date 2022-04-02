@@ -3,11 +3,10 @@ declare module 'node-etsy-client' {
     apiUrl: string;
     apiKey: string;
     lang: string;
-    shop: string;
     shopId: number;
   }>
 
-  export default class EtsyClient {
+  export default class EtsyClientV3 {
     constructor(options?: EtsyClientOptions);
 
     findShops(options?: EtsyClientOptions): Promise<string | object>;

@@ -2,28 +2,34 @@
 
 [![NPM](https://nodei.co/npm/node-etsy-client.png?compact=true)](https://npmjs.org/package/node-etsy-client)
 
-NodeJs Etsy [ReST API](https://www.etsy.com/developers/documentation) Client.
+NodeJs Etsy [ReST API](https://www.etsy.com/developers/documentation) Client ([V2](https://www.etsy.com/developers/documentation/getting_started/api_basics#reference), [V3](https://developers.etsy.com/documentation/)).
 
 - compatible with JavaScript and TypeScript.
 
-In addition, this library provide an extra [OAuth2Service](./src/OAuth2Service.js) service class useful to manage oAuth2 workflow: to build connect url, handle callback, and manage refresh token.
-
-Have a look into [oauth.js sample](src/sample/oauth.js) to make some oAuth2 manual test.
+In addition, this library provide an extra 
+- [OAuth2Service](./src/OAuth2Service.js) to manage oAuth2 workflow:
+  - build connect url, 
+  - handle callback, 
+  - and manage refresh token.
+  - with an [oauth.js sample](src/sample/oauth.js) to make some oAuth2 manual tests.
 
 ## EtsyClientV3 - BETA
 Features
 
-- findAllShops
+using apiKey:
+- findShops
 - getShop
-- findAllShopSections
-- findAllShopListingsActive
+- getShopSections
+- findAllActiveListingsByShop
 - getListing
-- getVariationImages
-- findAllListingImages
-- getInventory
-- getAttributes
-- getProduct
-- findAllListingShippingProfileEntries
+- getListingVariationImages
+- getListingImages
+- getListingProperty
+
+using apiKey + oauth token:
+- getListingsByShop
+- getListingInventory
+- getListingProduct
 
 # Quick start
 
@@ -40,10 +46,10 @@ npm install node-etsy-client
 
 then let's go, here is a `sample.js`:
 ```
-const EtsyClientV2 = require('node-etsy-client')
+const EtsyClientV3 = require('node-etsy-client')
 async function doIt() {
-  var client = new EtsyClientV2();
-  var shops = await client.getShops({'shopd_name':'mony', limit':10});
+  var client = new EtsyClientV3();
+  var shops = await client.findShops({'shop_name':'mony', limit':10});
   console.log(shops);
 }
 doIt();
@@ -58,26 +64,37 @@ var client = new EtsyClientV3({apiKey:'mSecretHere'});
 ## Advanced usage
 
 
+### Etsy debug mode
+
+To print out in the console the api call and response:
+```bash
+export ETSY_DEBUG=true
+```
+
 ### Etsy client options
-This section describes EtsyClientV2 available options.
+This section describes EtsyClientV2/EtsyClientV3 available options.
 
-Note about options precedence: first take option value from constructor if any, or
-else try to retrieve related environment variable, or else apply default value.
+Note about options precedence: 
+- first take option value from constructor if any, 
+- or else try to retrieve related environment variable, 
+- or else apply default value.
 
-- `apiUrl` : Etsy api endpoint - **required** (or env.`ETSY_API_ENDPOINT`) default value is (v2)`https://openapi.etsy.com/v2` / (v3)`https://openapi.etsy.com/v3`.
-- `apiKey` : Etsy api key - **required** (or env.`ETSY_API_KEY`) without default value. Ask one from [Etsy portal](https://www.etsy.com/developers/documentation/getting_started/register)
+Options:
+- `apiUrl` : Etsy api endpoint - (or env.`ETSY_API_ENDPOINT`) default value is (v2)`https://openapi.etsy.com/v2` / (v3)`https://openapi.etsy.com/v3`.
+- `apiKey` : Etsy api key - **required** (or env.`ETSY_API_KEY`) without default value. Ask one from [Etsy portal](https://www.etsy.com/developers/register).
 - (v2)`shop`   : Etsy shop name - *optional* (or env.`ETSY_SHOP`) without default value.
 - (v3)`shopId` : Etsy shop id - *optional* (or env.`ETSY_SHOP_ID`) without default value.
-- `lang`   : Etsy language - *optional* (or env.`ETSY_LANG`) without default value. Example: `fr`
-- `etsyRateWindowSizeMs` : Rate limit windows size in milliseconds - *optional* (or env.`ETSY_RATE_WINDOWS_SIZE_MS`) with default value: `1000`
+- `lang`   : Etsy language - *optional* (or env.`ETSY_LANG`) without default value. Example: `fr`.
+- `ETSY_DRY_MODE`) with default value: `false`.
+- `dryMode`              : print call instead of making real etsy call - *optional* (or env.`ETSY_DRY_MODE`) with default value: `false`.
+-`etsyRateWindowSizeMs` : Rate limit windows size in milliseconds - *optional* (or env.`ETSY_RATE_WINDOWS_SIZE_MS`) with default value: `1000`
 - `etsyRateMaxQueries`   : Rate limit max query per windows size - *optional* (or env.`ETSY_RATE_MAX_QUERIES`) without default value
-- `dryMode`              : print call instead of making real etsy call - *optional* (or env.`ETSY_DRY_MODE`) with default value: `false`
 
 Note about rate limit options:
 
-Rate limit is enabled if and only if `etsyRateWindowSizeMs` and `etsyRateMaxQueries` are both set.
+- rate limit is enabled if and only if `etsyRateWindowSizeMs` and `etsyRateMaxQueries` are both set.
 
-This will configure rate limit on etsy call : max `etsyRateMaxQueries` per `etsyRateWindowSizeMs`ms.
+- if enabled, rate limit on etsy call is max `etsyRateMaxQueries` per `etsyRateWindowSizeMs`ms.
 
 For more details, cf. [susi-rali](https://github.com/creharmony/susi-rali)
 
