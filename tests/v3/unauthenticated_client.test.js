@@ -1,11 +1,13 @@
 import EtsyClientV3 from '../../src/EtsyClientV3.js';
+import OAuth2Service from '../../src/OAuth2Service.js';
 
 import chai from 'chai';
 const should = chai.should;
 const expect = chai.expect;
-should();
+chai.should();
 
 const FAKE_API_KEY = "ultraSecretRightHere";
+const FAKE_TOKEN   = "ultraSecretRightHereBis";
 const shop_name = "mony";
 
 if (!process.env.ETSY_API_KEY) {
@@ -19,9 +21,25 @@ if (!process.env.ETSY_API_KEY) {
     it("should not report api key in error case", async function() {
       const client = new EtsyClientV3({
         apiKey:FAKE_API_KEY,
-        apiUrl:"https://IAmNotEtsyEndpoint.com"
+        accessToken:FAKE_TOKEN,
+        apiUrl:"https://IAmNotEtsyEndpoint.com",
+        shopId:123456
       });
-      const shops = await client.findShops({shop_name})
+      const shops = await client.getListingsByShop()
+        .catch(findShopsError => {
+          expect(""+findShopsError).to.not.include(FAKE_API_KEY);
+        })
+    });
+
+    it("should not report api key in error case (with rate limit)", async function() {
+      const client = new EtsyClientV3({
+        apiKey:FAKE_API_KEY,
+        accessToken:FAKE_TOKEN,
+        apiUrl:"https://IAmNotEtsyEndpoint.com",
+        etsyRateMaxQueries:10,
+        shopId:123456
+      });
+      const shops = await client.getListingsByShop()
         .catch(findShopsError => {
           expect(""+findShopsError).to.not.include(FAKE_API_KEY);
         })
@@ -117,6 +135,63 @@ if (!process.env.ETSY_API_KEY) {
 
       const getListingImagesEn = await client.getListingImages(listingId, {"language":"en"}).catch(_expectNoError);
       expect(getListingImagesEn.endpoint).to.be.eql(expectedEnEndpoint(`/listings/${listingId}/images`));
+    });
+
+    //~ oauth2
+
+    it("should provide oAuth2 connect url", async function() {
+      const oauth = new OAuth2Service();
+      const client_id = FAKE_API_KEY;
+      const redirect_uri = "https://www.exemple.com/mycallback";
+
+      // WHEN
+      const result = oauth.authenticate(client_id/*etsy api key*/, redirect_uri);
+
+      console.log(JSON.stringify(result, null, 2));
+
+      expect(result).to.have.property('state');
+      expect(result).to.have.property('codeVerifier');
+      expect(result).to.have.property('connectUrl');
+
+      expect(result.connectUrl).to.include("https%3A%2F%2Fwww.exemple.com%2Fmycallback");;
+      expect(result.connectUrl).to.include(FAKE_API_KEY);;
+      expect(result.connectUrl).to.include("response_type=code");;
+    });
+
+    it("should try error asking oAuth2 token", async function() {
+      const oauth = new OAuth2Service();
+      const client_id = FAKE_API_KEY;
+      const code = "wrong one";
+      const code_verifier = "yet another fake one";
+      const redirect_uri = "https://www.exemple.com/mycallback";
+
+      // WHEN
+      const result = await oauth.askForApiV3Token(client_id/*etsy api key*/, code, code_verifier, redirect_uri)
+                                .catch(err => {
+
+      console.log(JSON.stringify(err, null, 2));
+
+      expect(err).to.have.property('error');
+      expect(err.error).to.be.eql("Invalid API key");;
+
+                                });
+    });
+
+    it("should try error asking to refresh oAuth2 token", async function() {
+      const oauth = new OAuth2Service();
+      const client_id = FAKE_API_KEY;
+      const refresh_token = "yet another fake one";
+
+      // WHEN
+      const result = await oauth.refreshApiV3Token(client_id/*etsy api key*/, refresh_token)
+                                .catch(err => {
+
+      console.log(JSON.stringify(err, null, 2));
+
+      expect(err).to.have.property('error');
+      expect(err.error).to.be.eql("Invalid API key");;
+
+                                });
     });
 
   });

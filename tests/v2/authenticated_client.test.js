@@ -4,7 +4,7 @@ import EtsyClientV2 from '../../src/EtsyClientV2.js';
 import chai from 'chai';
 const should = chai.should;
 const expect = chai.expect;
-should();
+chai.should();
 
 const winstonTransports = [ new winston.transports.Console({ format: winston.format.simple() }) ];
 const logger = winston.createLogger({ transports: winstonTransports });
