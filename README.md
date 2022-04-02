@@ -13,7 +13,7 @@ In addition, this library provide an extra
   - and manage refresh token.
   - with an [oauth.js sample](src/sample/oauth.js) to make some oAuth2 manual tests.
 
-## EtsyClientV3 - BETA
+## EtsyClientV3 - *BETA*
 Features
 
 using apiKey:
@@ -127,6 +127,7 @@ For previous version < 1.0.0 (eg. `0.8.2`) node-etsy-client was providing only o
 Etsy v2 API will remain unavailable for a given amount of time in 2022 :
 
 - **WARNING** : v2 API will be discontinued : cf Etsy [migration page for more details](https://developers.etsy.com/documentation/migration/index#launch-stages)
+- planned EtsyClientV2 cleanup : [#41](https://github.com/creharmony/node-etsy-client/issues/41) to produce node-etsy-client v2
 
 
 ### EtsyClientV2 (deprecated)
