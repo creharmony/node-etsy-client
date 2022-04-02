@@ -6,7 +6,7 @@ const DEFAULT_DRY_MODE = false;// DEBUG // if true, then print fetch onto consol
 
 /**
  * this utility class implement ETSY (some) methods documented here:
- * https://www.etsy.com/developers/documentation > API Reference
+ * https://developers.etsy.com/documentation/ > API V3 Reference
  **/
 class EtsyClientV3 {
 
@@ -119,6 +119,16 @@ class EtsyClientV3 {
      this._assumeOAuth2();
      return this.limitedEtsyApiFetch(`/listings/${listingId}/inventory/products/${productId}`, options);
   }
+
+  /*
+   *
+   *
+   * the api you're looking for is missing ?
+   *  => add an issue ou create a pull-request !
+   *  => https://github.com/creharmony/node-etsy-client
+   *
+   *
+   */
 
   //~ rate limit and api utility tools under
 

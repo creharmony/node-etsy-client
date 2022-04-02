@@ -12,7 +12,7 @@
     "longTestV3": "set ETSY_LONG_TEST=1&& mocha --timeout 120000 tests/v3/unauthenticated_rate.test.js",
     "test": "mocha tests/**/*.test.js",
     "manual": "mocha tests/**/*.tst.js",
-    "cover": "nyc --reporter text --reporter cobertura --reporter html --reporter=lcov --lines 66 mocha --exit --unhandled-rejections=strict tests/*.test.js",
+    "cover": "nyc --reporter text --reporter cobertura --reporter html --reporter=lcov --lines 66 mocha --exit --unhandled-rejections=strict tests/**/*.test.js",
     "ci-test": "echo linux ci-test&& nyc --reporter text --reporter cobertura --reporter html --reporter=lcov --lines 66 mocha --exit --unhandled-rejections=strict tests/**/*.test.js --timeout 5000"
   },
   "private": false,

@@ -6,7 +6,7 @@ const DEFAULT_DRY_MODE = false;// DEBUG // if true, then print fetch onto consol
 
 /**
  * this utility class implement ETSY (some) methods documented here:
- * https://www.etsy.com/developers/documentation > API Reference
+ * https://www.etsy.com/developers/documentation/getting_started/api_basics#reference > API V2 Reference
  **/
 class EtsyClientV2 {
 
