@@ -1,6 +1,6 @@
 {
   "name": "node-etsy-client",
-  "version": "0.8.2",
+  "version": "1.0.0-beta.0",
   "description": "node-etsy-client",
   "main": "./src/EtsyClient.js",
   "types": "./src/EtsyClient.d.ts",
