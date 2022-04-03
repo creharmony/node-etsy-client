@@ -109,3 +109,6 @@ dist
 # drafts
 __*/
 *.dontpush.*
+
+# npm creds
+.npmrc
