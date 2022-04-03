@@ -170,8 +170,9 @@ npm run test
 |--------|-------|:--------|
 | ![CI/CD](https://github.com/creharmony/node-etsy-client/workflows/etsy_client_ci/badge.svg) |Github actions|Continuous tests + coverage using [c8](https://www.npmjs.com/package/c8).
 | [![scheduled npm audit](https://github.com/creharmony/node-etsy-client/actions/workflows/audit.yml/badge.svg)](https://github.com/creharmony/node-etsy-client/actions/workflows/audit.yml) |Github actions|Continuous vulnerability audit.
-|  |[Houndci](https://houndci.com/)|JavaScript  automated review (configured by `.hound.yml`)|
+| [<img src="https://cdn.icon-icons.com/icons2/2148/PNG/512/houndci_icon_132320.png" width="100">](https://houndci.com/)|[Houndci](https://houndci.com/)|JavaScript  automated review (configured by `.hound.yml`)|
 | [![Automated Release Notes by gren](https://img.shields.io/badge/%F0%9F%A4%96-release%20notes-00B2EE.svg)](https://github-tools.github.io/github-release-notes/)|[gren](https://github.com/github-tools/github-release-notes)|[Release notes](https://github.com/creharmony/node-etsy-client/releases) automation|
+|[<img src="https://codetheweb.blog/assets/img/posts/github-pages-free-hosting/cover.png" width="100">](https://creharmony.github.io/node-etsy-client/)| Github pages host some metrics for the main branch of this project: [code coverage](https://creharmony.github.io/node-etsy-client/)
 <!-- travis disabled
 | [![Build Status](https://travis-ci.com/creharmony/node-etsy-client.svg?branch=main)](https://travis-ci.com/creharmony/node-etsy-client) |[Travis-ci](https://travis-ci.com/creharmony/node-etsy-client)|Continuous tests.
 -->
