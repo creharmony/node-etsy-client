@@ -13,6 +13,10 @@ In addition, this library provide an extra
   - and manage refresh token.
   - with an [oauth.js sample](src/sample/oauth.js) to make some oAuth2 manual tests.
 
+Versions
+- last stable version : `0.8.2`
+- current beta: `1.0.0-beta.1`
+
 ## EtsyClientV3 - *BETA*
 Features
 
@@ -46,7 +50,7 @@ npm install node-etsy-client
 
 then let's go, here is a `sample.js`:
 ```
-const EtsyClientV3 = require('node-etsy-client')
+import { EtsyClientV3 } from 'node-etsy-client';
 async function doIt() {
   var client = new EtsyClientV3();
   var shops = await client.findShops({'shop_name':'mony', limit':10});
