@@ -68,3 +68,11 @@ jobs:
         echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_DEPLOY_TOKEN }}" > .npmrc
         npm whoami # rely on .npmrc
         npm publish
+
+    - name: "Deploy Github Pages (code-coverage)"
+      if: github.ref == 'refs/heads/main'
+      uses: JamesIves/github-pages-deploy-action@v4.2.5
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        BRANCH: gh-pages
+        FOLDER: coverage/
