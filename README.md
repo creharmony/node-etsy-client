@@ -133,7 +133,7 @@ Etsy v2 API will remain unavailable for a given amount of time in 2022 :
 - **WARNING** : v2 API will be discontinued : cf Etsy [migration page for more details](https://developers.etsy.com/documentation/migration/index#launch-stages)
 - planned EtsyClientV2 cleanup : [#41](https://github.com/creharmony/node-etsy-client/issues/41) to produce node-etsy-client v2
 
-During beta creation (#39) some ticket have been created on Etsy OpenAPI side, especially for the `getListing` api:
+During beta creation [#39](https://github.com/creharmony/node-etsy-client/issues/39) some ticket have been created on Etsy OpenAPI side, especially for the `getListing` api:
 - `includes` related ticket: etsy/open-api#236 (improvement)
 - `variations values translations` related ticket: etsy/open-api#431 (bug)
 
