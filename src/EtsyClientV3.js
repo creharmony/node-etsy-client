@@ -16,6 +16,7 @@ class EtsyClientV3 {
     if (!options) {
       options = {};
     }
+    this.nbCall = 0;
     this.apiUrl = "apiUrl" in options ? options.apiUrl : (process.env.ETSY_API_ENDPOINT || 'https://openapi.etsy.com/v3/application');
     this._assumeApiUrl();
     this.apiKey = "apiKey" in options ? options.apiKey : process.env.ETSY_API_KEY;
@@ -195,8 +196,14 @@ class EtsyClientV3 {
     if (this.accessToken != null && !("accessToken" in merged)) {
       merged['accessToken'] = this.accessToken;
     }
+    // default lang is client one
     if (this.lang != null && !("language" in merged)) {
       merged['language'] = this.lang;
+    }
+    // lang option override client one
+    if ("lang" in merged) {
+      merged['language'] = merged['lang'];
+      delete merged.lang;
     }
     return merged;
   }
@@ -213,16 +220,33 @@ class EtsyClientV3 {
     if (EtsyClientV3.debug) {
       console.log(">>>", endpoint);
     }
+    this.nbCall++;
     if (this.dryMode) {
       return this.dryFetch(endpoint);
     }
     return fetch(endpoint, { method: 'GET', headers });
   }
 
-  _assumeShopId() { if (!this.shopId) { throw "shopId is not defined";  } }
-  _assumeOAuth2() { if (!this.accessToken) { throw "accessToken is not defined";  } }
-  _assumeApiUrl() { if (!this.apiUrl) { throw "apiUrl is required. ie. set ETSY_API_ENDPOINT environment variable.";  } }
-  _assumeApiKey() { if (!this.apiKey) { throw "apiKey is required. ie. set ETSY_API_KEY environment variable.";  } }
+  getNbCall() {
+    return this.nbCall;
+  }
+
+  razStats() {
+    this.nbCall = 0;
+  }
+
+  hasOAuth2() {
+    return isSet(this.accessToken);
+  }
+
+  setAccessToken(accessToken) {
+    this.accessToken = accessToken;
+  }
+
+  _assumeShopId() { if (!isSet(this.shopId)) { throw "shopId is not defined";  } }
+  _assumeOAuth2() { if (!isSet(this.accessToken)) { throw "accessToken is not defined";  } }
+  _assumeApiUrl() { if (!isSet(this.apiUrl)) { throw "apiUrl is required. ie. set ETSY_API_ENDPOINT environment variable.";  } }
+  _assumeApiKey() { if (!isSet(this.apiKey)) { throw "apiKey is required. ie. set ETSY_API_KEY environment variable.";  } }
   _assumeField(fieldName, fieldValue) { if (!fieldValue) { throw fieldName + " is required";  } }
 
   static _response(response, resolve, reject) {
@@ -266,3 +290,5 @@ class EtsyClientV3 {
   }
 }
 export default EtsyClientV3;
+
+const isSet = (val) => val !== undefined && val !== null && val !== "";

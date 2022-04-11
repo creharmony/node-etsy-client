@@ -130,10 +130,10 @@ if (!process.env.ETSY_API_KEY) {
 
       //~ language is defined in query-specific options
 
-      const getListingEn = await client.getListing(listingId, {"language":"en"}).catch(_expectNoError);
+      const getListingEn = await client.getListing(listingId, {"lang":"en"}).catch(_expectNoError);
       expect(getListingEn.endpoint).to.be.eql(expectedEnEndpoint(`/listings/${listingId}`));
 
-      const getListingImagesEn = await client.getListingImages(listingId, {"language":"en"}).catch(_expectNoError);
+      const getListingImagesEn = await client.getListingImages(listingId, {"lang":"en"}).catch(_expectNoError);
       expect(getListingImagesEn.endpoint).to.be.eql(expectedEnEndpoint(`/listings/${listingId}/images`));
     });
 

@@ -2,7 +2,9 @@ for beta versions we publish them manually
 
     git fetch --all
     git checkout main
-    npm version 1.0.0-beta.0
+    git pull
+    git fetch -p
+    npm version 1.0.0-beta.2
     npm publish --tag beta
     git push origin main --tags
 

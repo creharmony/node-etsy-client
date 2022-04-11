@@ -15,7 +15,7 @@ In addition, this library provide an extra
 
 Versions
 - last stable version : `0.8.2`
-- current beta: `1.0.0-beta.1`
+- current beta: `1.0.0-beta.2`
 
 ## EtsyClientV3 - *BETA*
 Features
