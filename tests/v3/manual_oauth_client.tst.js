@@ -22,7 +22,7 @@ var productId     = process.env.ETSY_TEST_PRODUCT_ID;
 
 // setup debug mode : export ETSY_DEBUG=true
 
-if (apiKey && accessToken) {
+if (apiKey && shopId && accessToken && listingId) {
 
   before(function () {
     var testConfig = {apiKey};
@@ -52,11 +52,8 @@ if (apiKey && accessToken) {
 
         const state = "active"; // Enum: "active" "inactive" "sold_out" "draft" "expired"
         logger.info(" - [getListingsByShop] get listings for a given shopId and state ", {shopId, state});
-        var getListingsByShop = await client.getListingsByShop({shopId, state})
+        var getListingsByShop = await client.getListingsByShop({shopId, state, limit: 3})
                                              .catch(err =>console.log("getListingsByShop err", err));
-
-        // first test with scope=['shops_r','listings_r'] -
-        // err: Could not find a shop for user with user_id = xxxx // etsy bug ???
 
         if (isSet(getListingsByShop)) {
           logger.info(JSON.stringify(getListingsByShop, null, 2));
@@ -79,7 +76,11 @@ if (apiKey && accessToken) {
                                   " - offerings:" + product.offerings.length +
                                   " - property_values:"+ product.property_values.length
                       );
+            if (!isSet(productId)) {
+              productId = product.product_id;
+            }
           });
+
         }
       });
 
@@ -87,7 +88,7 @@ if (apiKey && accessToken) {
 
     if (productId !== null) {
 
-      it(`should get listing inventory ${listingId} product ${productId}`, async function() {
+      it(`should get listing inventory ${listingId} product`, async function() {
 
         logger.info(" - [getListingProduct] get listing inventory product", {listingId, productId});
         var getListingProduct = await client.getListingProduct(listingId, productId, {})
@@ -99,12 +100,10 @@ if (apiKey && accessToken) {
 
     }
 
-    logger.info(" productId",productId)
-
   });
 
 } else {
-  console.info("WARNING - wont play oauth client tests without ETSY_TEST_API_KEY ETSY_TEST_ACCESS_TOKEN ETSY_TEST_LISTING_ID");
+  console.info("WARNING - wont play oauth client tests without ETSY_TEST_API_KEY ETSY_TEST_SHOP_ID ETSY_TEST_ACCESS_TOKEN ETSY_TEST_LISTING_ID");
 }
 
 function isSet(value) {

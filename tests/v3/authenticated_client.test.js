@@ -64,7 +64,7 @@ if (apiKey) {
          var twoShops = await client.findShops({shop_name, 'limit':2})
                                     .catch(err =>console.log("findShops err", err));
          twoShops.should.not.be.empty;
-         expect(twoShops.results).to.have.lengthOf(3); // (2); // wait for etsy fix // https://github.com/etsy/open-api/issues/420
+         expect(twoShops.results).to.have.lengthOf(2);
          logger.debug("twoShops",{twoShops});
          logger.info(" * 2 shops ", {'shop0':twoShops.results[0].shop_name,
                                      'shop1':twoShops.results[1].shop_name,
