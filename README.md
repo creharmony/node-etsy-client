@@ -13,11 +13,8 @@ In addition, this library provide an extra
   - and manage refresh token.
   - with an [oauth.js sample](src/sample/oauth.js) to make some oAuth2 manual tests.
 
-Versions
-- last stable version : `0.8.2`
-- current beta: `1.0.0-beta.2`
 
-## EtsyClientV3 - *BETA*
+## EtsyClientV3
 Features
 
 using apiKey:
@@ -53,7 +50,7 @@ then let's go, here is a `sample.js`:
 import { EtsyClientV3 } from 'node-etsy-client';
 async function doIt() {
   var client = new EtsyClientV3();
-  var shops = await client.findShops({'shop_name':'mony', limit':10});
+  var shops = await client.findShops({'shop_name':'mony', limit:10});
   console.log(shops);
 }
 doIt();
@@ -95,6 +92,8 @@ Options:
 - `etsyRateMaxQueries`   : Rate limit max query per windows size - *optional* (or env.`ETSY_RATE_MAX_QUERIES`) without default value
 
 Note about rate limit options:
+
+- rate limit is recommended for V2 client.
 
 - rate limit is enabled if and only if `etsyRateWindowSizeMs` and `etsyRateMaxQueries` are both set.
 

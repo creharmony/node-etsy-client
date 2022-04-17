@@ -3,7 +3,7 @@
   "version": "1.0.0-beta.2",
   "description": "node-etsy-client",
   "main": "./lib/export.js",
-  "types": "./lib/export.js",
+  "types": "./lib/export.d.ts",
   "type": "module",
   "scripts": {
     "testV2": "mocha tests/v2/*.test.js",
