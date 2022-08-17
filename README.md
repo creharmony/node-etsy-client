@@ -150,8 +150,6 @@ Features
 - getListingImages
 - getListingProperty
 
-
-
 ## How to contribute
 You're not a dev ? just submit an issue (bug, improvements, questions). Or else:
 * Clone
