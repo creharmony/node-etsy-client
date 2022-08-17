@@ -41,7 +41,7 @@
     "author": "Brice Vandeputte"
   },
   "dependencies": {
-    "node-fetch": "^3.2.3",
+    "node-fetch": "^3.2.10",
     "query-string": "^7.1.1",
     "susi-rali": "^0.2.2",
     "winston": "^3.6.0"
