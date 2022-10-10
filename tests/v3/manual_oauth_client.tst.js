@@ -17,16 +17,16 @@ const accessToken = process.env.ETSY_TEST_ACCESS_TOKEN;
 const shopName    = process.env.ETSY_TEST_SHOP_NAME;
 const shopId      = process.env.ETSY_TEST_SHOP_ID;
 var listingId     = process.env.ETSY_TEST_LISTING_ID;
-var productId     = process.env.ETSY_TEST_PRODUCT_ID;
+var productId     = process.env.ETSY_TEST_PRODUCT_ID || null;
 
 const display = {
-  shopDetail: false,
+  shopDetail: true,
   shopSections: false,
   allActiveListings: false,
   listings: false,
-  listingDetails: false,
+  listingDetails: true,
   listingImages: false,
-  listingInventory: true,
+  listingInventory: false,
   listingProduct: false
 }
 
@@ -110,7 +110,7 @@ if (apiKey && shopId && accessToken && listingId) {
     if (listingId) {
 
       it(`should get listing ${listingId} details`, async function() {
-        const includes = "images,translations";
+        const includes = "Inventory,images,translations";// variations not supported
 
         logger.info(" - [getListing] get listing ", {listingId, includes});
         var getListing = await client.getListing(listingId, {includes})
@@ -136,7 +136,7 @@ if (apiKey && shopId && accessToken && listingId) {
         var getListingInventory = await client.getListingInventory(listingId, {})
                                               .catch(err =>console.log("getListingInventory err", err));
         if (isSet(getListingInventory) && display.listingInventory === true) {
-          logger.info(JSON.stringify(getListingInventory, null, 2));
+          // DEBUG // logger.info(JSON.stringify(getListingInventory, null, 2));
           getListingInventory.products.forEach(product => {
                       logger.info(" product #"+ product.product_id +
                                   ( product.is_deleted ? " *deleted* " : "" ) +
@@ -147,7 +147,9 @@ if (apiKey && shopId && accessToken && listingId) {
               productId = product.product_id;
             }
           });
-
+        }
+        if (!isSet(productId) && getListingInventory.products && getListingInventory.products.length > 0) {
+          productId = getListingInventory.products[0].product_id;
         }
       });
 

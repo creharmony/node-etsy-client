@@ -15,7 +15,7 @@ var client;
 const apiKey    = process.env.ETSY_TEST_API_KEY;
 const shopName  = process.env.ETSY_TEST_SHOP_NAME;
 const shopId    = process.env.ETSY_TEST_SHOP_ID;
-var listingId = null;
+var listingId = null; //  "1011358134";
 
 var testPlan = {
   shops: true,
@@ -122,7 +122,7 @@ if (apiKey) {
                      " - "+ element.price.amount/element.price.divisor + " " + element.price.currency_code);
         })
 
-        listingId = activeListings.results[0].listing_id;
+        listingId = listingId === null ? activeListings.results[0].listing_id : listingId;
       });
     }
 
@@ -138,6 +138,7 @@ if (apiKey) {
           logger.info(" x none");
           return;
         }
+        console.info("getListing", JSON.stringify(listing));
         logger.info(" * #"+ listing.listing_id+ " ("+ listing.quantity + ") " + listing.title +
                    " - "+ listing.price.amount/listing.price.divisor + " " + listing.price.currency_code);
 
@@ -155,8 +156,7 @@ if (apiKey) {
           logger.info("no image");
         } else {
           getListingVariationImages.results.forEach(element => {
-            logger.info(" - #"+ element.listing_image_id+ " (" + element.full_height + "x" + element.full_width + ") " +
-                       element.url_fullxfull);
+            logger.info(" - prop#"+ element.property_id+ " value#"+ element.value_id + " >" + element.value + " image #" + element.image_id );
           })
         }
 

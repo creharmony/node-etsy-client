@@ -20,6 +20,7 @@ if (!process.env.ETSY_API_KEY) {
 
     it("should not report api key in error case", async function() {
       const client = new EtsyClientV3({
+        apiTimeoutMs: 100,
         apiKey:FAKE_API_KEY,
         accessToken:FAKE_TOKEN,
         apiUrl:"https://IAmNotEtsyEndpoint.com",
@@ -175,6 +176,7 @@ if (!process.env.ETSY_API_KEY) {
       expect(err.error).to.be.eql("Invalid API key");;
 
                                 });
+                                console.log("pouet");
     });
 
     it("should try error asking to refresh oAuth2 token", async function() {
@@ -199,6 +201,7 @@ if (!process.env.ETSY_API_KEY) {
 
 function enrichOptionsWithTestConfiguration(options) {
   options.apiKey = FAKE_API_KEY;
+  options.apiTimeoutMs = 100;
   options.apiUrl = "https://IAmNotEtsyEndpoint.com";
   options.shop = "MyShop";
   options.shopId = "321123";
@@ -207,6 +210,6 @@ function enrichOptionsWithTestConfiguration(options) {
 }
 
 function _expectNoError(err) {
-  console.trace(err instanceof String ? err : JSON.stringify(err))
+  console.trace(err);
   expect.fail(err);
 }

@@ -17,6 +17,7 @@ if (!process.env.ETSY_API_KEY) {
 
     it("should not report api key in error case", async function() {
       const client = new EtsyClientV2({
+        apiTimeoutMs: 100,
         apiKey:FAKE_API_KEY,
         apiUrl:"https://IAmNotEtsyEndpoint.com"
       });
@@ -127,6 +128,7 @@ if (!process.env.ETSY_API_KEY) {
 
 function enrichOptionsWithTestConfiguration(options) {
   options.apiKey = FAKE_API_KEY;
+  options.apiTimeoutMs = 100;
   options.apiUrl = "https://IAmNotEtsyEndpoint.com";
   options.shop = "MyShop";
   options.lang = "fr";

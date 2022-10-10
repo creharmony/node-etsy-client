@@ -1,6 +1,6 @@
 // DOC: https://developers.etsy.com/documentation/essentials/authentication
 
-import fetch from "node-fetch";
+import axios from "axios";
 import crypto from 'crypto';
 import queryString from 'query-string';
 
@@ -24,7 +24,7 @@ const OAUTH_DEBUG = process.env.OAUTH_DEBUG === "1" || false;
  * 2) <incoming callback> : retrieve req.query.code && req.query.state
  *                          [query state and session state must match]
  *
- * 3) askForApiV3Token    : using code + session codeVerifier, fetch etsy token
+ * 3) askForApiV3Token    : using code + session codeVerifier, request etsy token
  **/
 class OAuth2Service {
 
@@ -88,20 +88,15 @@ class OAuth2Service {
      * }
      **/
     askForApiV3Token(client_id/*etsy api key*/, code, code_verifier, redirect_uri) {
-
       const grant_type = "authorization_code";
-      const requestOptions = {
-          method: 'POST',
-          body: JSON.stringify({ grant_type, client_id, redirect_uri, code, code_verifier }),
-          headers: {'Content-Type': 'application/json'}
-      };
+      const postPayload = { grant_type, client_id, redirect_uri, code, code_verifier };
 
       return new Promise(function(resolve, reject) {
         const askTime = nowSec();
-        fetch(ETSY_V3_API_OAUTH_TOKEN_URL, requestOptions)
-        .then(async function(response) {
-          if (response.ok) {
-            var json = await response.json();
+        axios.post(ETSY_V3_API_OAUTH_TOKEN_URL, postPayload)
+        .then(response => {
+          if (response.status >= 200 && response.status < 300) {
+            var json = response.data;
             var tokenData = Object.assign({}, json);
             // tokenData.expires_ts = askTime - 123;// DEV // simulate expired token
             tokenData.expires_ts = askTime + tokenData.expires_in;
@@ -110,9 +105,9 @@ class OAuth2Service {
             throw response;
           }
         })
-        .catch(async function (response) {
-           const status = response.status;
-           const json = await response.json();
+        .catch(result => {
+           const status = result.status;
+           const json = result.response.data;
            OAUTH_DEBUG && console.log({status, json})
            reject(json);
         });
@@ -124,19 +119,15 @@ class OAuth2Service {
     // https://developers.etsy.com/documentation/essentials/authentication#requesting-a-refresh-oauth-token
     refreshApiV3Token(client_id/*etsy api key*/, refresh_token) {
       const grant_type = "refresh_token";
-      const requestOptions = {
-          method: 'POST',
-          body: JSON.stringify({ grant_type, client_id, refresh_token }),
-          headers: {'Content-Type': 'application/json'}
-      };
+      const postPayload = { grant_type, client_id, refresh_token };
 
       return new Promise(function(resolve, reject) {
 
         const askTime = nowSec();
-        fetch(ETSY_V3_API_OAUTH_TOKEN_URL, requestOptions)
-        .then(async function(response) {
-          if (response.ok) {
-            var json = await response.json();
+        axios.post(ETSY_V3_API_OAUTH_TOKEN_URL, postPayload)
+        .then(response => {
+          if (response.status >= 200 && response.status < 300) {
+            var json = response.data;
             var tokenData = Object.assign({}, json);
             tokenData.expires_ts = askTime + tokenData.expires_in;
             resolve(tokenData);
@@ -144,9 +135,9 @@ class OAuth2Service {
             throw response;
           }
         })
-        .catch(async function (response) {
-           const status = response.status;
-           const json = await response.json();
+        .catch(result => {
+           const status = result.status;
+           const json = result.response.data;
            OAUTH_DEBUG && console.log({status, json})
            reject(json);
         });
