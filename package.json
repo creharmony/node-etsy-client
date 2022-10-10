@@ -6,13 +6,16 @@
   "types": "./lib/export.d.ts",
   "type": "module",
   "scripts": {
-    "testV2": "mocha tests/v2/*.test.js",
-    "longTestV2": "set ETSY_LONG_TEST=1&& mocha --timeout 120000 tests/v2/unauthenticated_rate.test.js",
-    "testV3": "nyc mocha tests/v3/*.test.js",
-    "longTestV3": "set ETSY_LONG_TEST=1&& mocha --timeout 120000 tests/v3/unauthenticated_rate.test.js",
+    "setup": "npm install -g c8",
+    "testV2": "c8 --reporter text --reporter=lcov --lines 66 mocha tests/v2/*.test.js",
+    "testV3": "c8 --reporter text --reporter=lcov --lines 66 mocha tests/v3/*.test.js",
     "simpleTest": "mocha tests/mytest.js",
-    "test": "mocha tests/**/*.test.js",
-    "manual": "mocha tests/**/*.tst.js",
+    "wip2": "mocha --timeout 120000 tests/manual/tmpV2ListingActive.dontpush.test.js",
+    "wip3": "mocha --timeout 120000 tests/manual/tmpV3ListingActive.dontpush.test.js",
+    "variation": "mocha --timeout 120000 tests/manual/tmpV3Variation.dontpush.test.js",
+    "test": "mocha --timeout 120000 tests/v2/*.test.js tests/v3/*.test.js",
+    "manual": "mocha tests/manual/*.test.js",
+    "manualV3": "mocha tests/v3/un*.test.js",
     "ci-test": "c8 npm run test"
   },
   "private": false,
@@ -41,6 +44,7 @@
     "author": "Brice Vandeputte"
   },
   "dependencies": {
+    "axios": "^1.1.2",
     "node-fetch": "^3.2.10",
     "query-string": "^7.1.1",
     "susi-rali": "^0.2.2",

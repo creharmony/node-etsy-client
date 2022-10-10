@@ -1,8 +1,8 @@
 import queryString from 'query-string';
-import fetch from 'node-fetch';
+import axios from "axios";
 import SusiRali from 'susi-rali';
 
-const DEFAULT_DRY_MODE = false;// DEBUG // if true, then print fetch onto console instead of calling etsy
+const DEFAULT_DRY_MODE = false;// DEBUG // if true, then print get onto console instead of calling etsy
 
 /**
  * this utility class implement ETSY (some) methods documented here:
@@ -18,6 +18,8 @@ class EtsyClientV3 {
     }
     this.nbCall = 0;
     this.apiUrl = "apiUrl" in options ? options.apiUrl : (process.env.ETSY_API_ENDPOINT || 'https://openapi.etsy.com/v3/application');
+    this.apiTimeoutMs = Number("apiTimeoutMs" in options ? options.apiTimeoutMs : (process.env.ETSY_API_TIMEOUT_MS || '20000'));
+    this.apiTimeoutMs = (this.apiTimeoutMs > 1000 && this.apiTimeoutMs < 300000) ? this.apiTimeoutMs : 20000;
     this._assumeApiUrl();
     this.apiKey = "apiKey" in options ? options.apiKey : process.env.ETSY_API_KEY;
     this._assumeApiKey();
@@ -29,7 +31,12 @@ class EtsyClientV3 {
     this.etsyRateWindowSizeMs = "etsyRateWindowSizeMs" in options ? options.etsyRateWindowSizeMs : (process.env.ETSY_RATE_WINDOWS_SIZE_MS  || 1000);
     this.etsyRateMaxQueries   = "etsyRateMaxQueries" in options ? options.etsyRateMaxQueries : (process.env.ETSY_RATE_MAX_QUERIES || null);
     this.dryMode              = "dryMode" in options ? options.dryMode : ("true" === process.env.ETSY_DRY_MODE || DEFAULT_DRY_MODE);
+
     this.initRateLimiter();
+    this._axios = axios.create({
+      baseURL: this.apiUrl,
+      timeout: this.apiTimeoutMs
+    });
     // DEBUG // console.debug(`EtsyClientV3 - apiUrl:${this.apiUrl} - dryMode:${this.dryMode} - ${this.limiterDesc}`);
   }
 
@@ -69,6 +76,12 @@ class EtsyClientV3 {
   findAllActiveListingsByShop(options) {
      this._assumeShopId();
      return this.limitedEtsyApiFetch(`/shops/${this.shopId}/listings/active`, options);
+  }
+  // https://github.com/etsy/open-api/issues/377
+  findAllActiveListingsByShopHack(options) {
+     this._assumeShopId();
+     options.state="active";
+     return this.limitedEtsyApiFetch(`/shops/${this.shopId}/listings`, options);
   }
 
   // https://developers.etsy.com/documentation/reference/#operation/getListing
@@ -161,17 +174,15 @@ class EtsyClientV3 {
          delete queryOptions.apiKey;
          delete queryOptions.accessToken
          const getQueryString = queryString.stringify(queryOptions);
-         const fetchEndpoint = `${client.apiUrl}${endpoint}?${getQueryString}`;
-         EtsyClientV3.debug && console.log(`fetch ${fetchEndpoint} headers: **hidden**`);
-         client.nodeFetch(fetchEndpoint, headers)
+         const requestEndpoint = `${client.apiUrl}${endpoint}?${getQueryString}`;
+         EtsyClientV3.debug && console.log(`request ${requestEndpoint} headers: **hidden**`);
+         client.nodeAxios(requestEndpoint, headers)
            .then(response => EtsyClientV3._response(response, resolve, reject))
-           .catch(fetchError => {
-             EtsyClientV3.debug && console.log(`fetch err ${JSON.stringify(fetchError)}`);
+           .catch(requestError => {
+             EtsyClientV3.debug && console.log(`request err ${JSON.stringify(requestError)}`);
              var secureError = {};
-             client.secureErrorAttribute(secureError, fetchError, "error");
-             client.secureErrorAttribute(secureError, fetchError, "type");
-             client.secureErrorAttribute(secureError, fetchError, "errno");
-             client.secureErrorAttribute(secureError, fetchError, "code");
+             client.secureErrorAttribute(secureError, requestError, "message");
+             client.secureErrorAttribute(secureError, requestError, "code");
              reject(secureError);
            });
      });
@@ -210,13 +221,14 @@ class EtsyClientV3 {
 
   dryFetch(endpoint) {
     const response = {};
-    response.ok = true;
-    response.text = function(){ return JSON.stringify({endpoint});};
-    console.log(`[dry_fetch] ${endpoint}`);
+    response.status = 200;
+    response.data = {endpoint};
+    console.log(`[dry_get] ${endpoint}`);
     return Promise.resolve(response);
   }
 
-  nodeFetch(endpoint, headers=[]) {
+  nodeAxios(endpoint, headers=[]) {
+    const client = this;
     if (EtsyClientV3.debug) {
       console.log(">>>", endpoint);
     }
@@ -224,7 +236,7 @@ class EtsyClientV3 {
     if (this.dryMode) {
       return this.dryFetch(endpoint);
     }
-    return fetch(endpoint, { method: 'GET', headers });
+    return client._axios.get(endpoint, { headers });
   }
 
   getNbCall() {
@@ -250,44 +262,13 @@ class EtsyClientV3 {
   _assumeField(fieldName, fieldValue) { if (!fieldValue) { throw fieldName + " is required";  } }
 
   static _response(response, resolve, reject) {
-    EtsyClientV3._consumeResponseBodyAs(response,
-      (json) => {
-        if (!response.ok) {
-          reject((json && json.error) || (json && json.details) || (json && json.message) || response.status);
-        } else {
-          resolve(json);
-        }
-      },
-      (txt) => {
-        if (!response.ok) {
-          reject(txt);
-        } else {
-          resolve(txt);// some strange case
-        }
-      }
-    );
+    if (response.status >= 200 && response.status < 300) {
+      resolve(response.data);
+    } else {
+      reject(response.data);
+    }
   }
 
-  static _consumeResponseBodyAs(response, jsonConsumer, txtConsumer) {
-    (async () => {
-      var responseString = await response.text();
-      try{
-        if (responseString && typeof responseString === "string"){
-         var responseParsed = JSON.parse(responseString);
-         if (EtsyClientV3.debug) {
-            console.log("RESPONSE(Json)", responseParsed);
-         }
-         return jsonConsumer(responseParsed);
-        }
-      } catch(error) {
-        // text is not a valid json so we will consume as text
-      }
-      if (EtsyClientV3.debug) {
-        console.log("RESPONSE(Txt)", responseString);
-      }
-      return txtConsumer(responseString);
-    })();
-  }
 }
 export default EtsyClientV3;
 

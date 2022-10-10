@@ -21,6 +21,7 @@ var testPlan = {
   shopDetails: true,
   shopSections: true,
   shopActiveListings: true,
+  shopListingDetails:true,
   shopListingImages:true,
   shopListingShippingInfo:true
 }
@@ -119,6 +120,24 @@ if (apiKey) {
         if (!listingId) {
           listingId = activeListings.results[0].listing_id;
         }
+      });
+    }
+
+    if(testPlan.shopListingDetails && listingId) {
+      it("should get shop listing details", async function() {
+
+        var imageAttributes = "listing_image_id,url_75x75,rl_170x135,url_570xN,url_fullxfull";
+        var imagesAssociation = "Images("+imageAttributes+")";
+        var mainImageAssociation = "MainImage(" + imageAttributes+ ")";
+        // var shippingInfoAssociation = "ShippingInfo(shipping_info_id,origin_country_name,destination_country_name,primary_cost,secondary_cost,currency_code)";
+
+        var includes = ["Inventory", imagesAssociation, mainImageAssociation, "Variations"].join(","); // shippingInfoAssociation,
+
+        logger.info(" - [getListing] get listing ", {listingId, 'limit':imagesLimit});
+        var listingDetails = await client.getListing(listingId, { language: 'en', translate_keywords:true, currency: "EUR", includes })
+                                              .catch(err=>console.log("getListing err", err));
+        console.info("listingDetails", JSON.stringify(listingDetails));
+
       });
     }
 
