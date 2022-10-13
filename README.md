@@ -2,7 +2,7 @@
 
 [![NPM](https://nodei.co/npm/node-etsy-client.png?compact=true)](https://npmjs.org/package/node-etsy-client)
 
-NodeJs Etsy [ReST API](https://www.etsy.com/developers/documentation) Client ([V2](https://www.etsy.com/developers/documentation/getting_started/api_basics#reference), [V3](https://developers.etsy.com/documentation/)).
+NodeJs Etsy [REST API](https://www.etsy.com/developers/documentation) Client ([V2](https://www.etsy.com/developers/documentation/getting_started/api_basics#reference), [V3](https://developers.etsy.com/documentation/)).
 
 - compatible with JavaScript and TypeScript.
 
@@ -27,19 +27,19 @@ using apiKey:
 - getListingImages
 - getListingProperty
 
-using apiKey + oauth token:
+using apiKey + OAuth token:
 - getListingsByShop
 - getListingInventory
 - getListingProduct
 
 # Quick start
 
-First declare your api key :
+First declare your api key:
 ```
 export ETSY_API_KEY=xxxxxxxxxxx
 ```
 
-install node-etsy-client
+install node-etsy-client:
 
 ```
 npm install node-etsy-client
@@ -55,7 +55,7 @@ async function doIt() {
 }
 doIt();
 ```
-You could play mocha tests to get more examples (cf. next section).
+You could play Mocha tests to get more examples (cf. next section).
 
 You could avoid using environment variable by using constructor options:
 ```
@@ -67,7 +67,7 @@ var client = new EtsyClientV3({apiKey:'mSecretHere'});
 
 ### Etsy debug mode
 
-To print out in the console the api call and response:
+To print out in the console the API call and response:
 ```bash
 export ETSY_DEBUG=true
 ```
@@ -81,15 +81,18 @@ Note about options precedence:
 - or else apply default value.
 
 Options:
-- `apiUrl` : Etsy api endpoint - (or env.`ETSY_API_ENDPOINT`) default value is (v2)`https://openapi.etsy.com/v2` / (v3)`https://openapi.etsy.com/v3`.
-- `apiKey` : Etsy api key - **required** (or env.`ETSY_API_KEY`) without default value. Ask one from [Etsy portal](https://www.etsy.com/developers/register).
-- (v2)`shop`   : Etsy shop name - *optional* (or env.`ETSY_SHOP`) without default value.
-- (v3)`shopId` : Etsy shop id - *optional* (or env.`ETSY_SHOP_ID`) without default value.
-- `lang`   : Etsy language - *optional* (or env.`ETSY_LANG`) without default value. Example: `fr`.
-- `ETSY_DRY_MODE`) with default value: `false`.
-- `dryMode`              : print call instead of making real etsy call - *optional* (or env.`ETSY_DRY_MODE`) with default value: `false`.
--`etsyRateWindowSizeMs` : Rate limit windows size in milliseconds - *optional* (or env.`ETSY_RATE_WINDOWS_SIZE_MS`) with default value: `1000`
-- `etsyRateMaxQueries`   : Rate limit max query per windows size - *optional* (or env.`ETSY_RATE_MAX_QUERIES`) without default value
+
+| Name          |                                                                   Description                                                                   |
+|-------------|:-----------------------------------------------------------------------------------------------------------------------------------------------:|
+| `apiUrl` |     Etsy API endpoint - (or env.`ETSY_API_ENDPOINT`) default value is (v2)`https://openapi.etsy.com/v2` / (v3)`https://openapi.etsy.com/v3`     |
+| `apiKey` | Etsy API key - **required** (or env.`ETSY_API_KEY`) without default value. Ask one from [Etsy portal](https://www.etsy.com/developers/register) |
+| (v2)`shop`      |                                     Etsy shop name - *optional* (or env.`ETSY_SHOP`) without default value                                      |
+| (v3)`shopId` |                                     Etsy shop id - *optional* (or env.`ETSY_SHOP_ID`) without default value                                     |
+| `lang`      |                              Etsy language - *optional* (or env.`ETSY_LANG`) without default value. Example: `fr`                               |
+| `ETSY_DRY_MODE`) with default value |                                                                     `false`   |
+| `dryMode`       |                  print call instead of making real etsy call - *optional* (or env.`ETSY_DRY_MODE`) with default value: `false`                  |
+| `etsyRateWindowSizeMs` |              Rate limit windows size in milliseconds - *optional* (or env.`ETSY_RATE_WINDOWS_SIZE_MS`) with default value: `1000`               |
+| `etsyRateMaxQueries`     |                    Rate limit max query per windows size - *optional* (or env.`ETSY_RATE_MAX_QUERIES`) without default value                    |
 
 Note about rate limit options:
 
