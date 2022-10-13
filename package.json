@@ -6,6 +6,7 @@
   "types": "./lib/export.d.ts",
   "type": "module",
   "scripts": {
+    "audit": "npm audit&&npm outdated --depth=3",
     "setup": "npm install -g c8",
     "testV2": "c8 --reporter text --reporter=lcov --lines 66 mocha tests/v2/*.test.js",
     "testV3": "c8 --reporter text --reporter=lcov --lines 66 mocha tests/v3/*.test.js",
@@ -45,14 +46,13 @@
   },
   "dependencies": {
     "axios": "^1.1.2",
-    "node-fetch": "^3.2.10",
     "query-string": "^7.1.1",
-    "susi-rali": "^0.2.2",
-    "winston": "^3.6.0"
+    "susi-rali": "^0.2.3",
+    "winston": "^3.8.2"
   },
   "devDependencies": {
     "chai": "^4.3.6",
-    "mocha": "^9.2.2",
+    "mocha": "^10.0.0",
     "npm-force-resolutions": "^0.0.10"
   },
   "resolutions": {
