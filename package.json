@@ -52,13 +52,16 @@
   },
   "devDependencies": {
     "chai": "^4.3.6",
-    "mocha": "^10.0.0",
+    "mocha": "^10.1.0",
+    "minimatch": "^3.1.2",
     "npm-force-resolutions": "^0.0.10"
   },
   "resolutions": {
-    "minimist": "^1.2.6"
+    "minimist": "^1.2.6",
+    "minimatch": "^3.1.2"
   },
   "jshintConfig": {
     "esversion": 6
-  }
+  },
+  "devNotes": "fix minimatch version to avoid mocha version with vulnerability"
 }
