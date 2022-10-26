@@ -44,6 +44,8 @@ jobs:
       run: |
         npm run setup
         npm install
+        echo "show outdated (if any)"
+        npm outdated --depth=3 || echo "you must think about update your dependencies :)"
 
     - name: Run ci-tests with code coverage
       run: |
@@ -57,7 +59,7 @@ jobs:
         lcov-file: ./coverage/lcov.info
 
     - name: Npm audit
-      uses: oke-py/npm-audit-action@v1.7.1
+      uses: oke-py/npm-audit-action@v2
       with:
         audit_level: moderate
         github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -72,7 +74,7 @@ jobs:
 
     - name: "Deploy Github Pages (code-coverage)"
       if: github.ref == 'refs/heads/main'
-      uses: JamesIves/github-pages-deploy-action@v4.2.5
+      uses: JamesIves/github-pages-deploy-action@v4
       with:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         BRANCH: gh-pages

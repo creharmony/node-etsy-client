@@ -10,7 +10,7 @@
   "all": false,
   "statements": 90,
   "branches": 70,
-  "functions": 90,
+  "functions": 80,
   "lines": 90,
   "dev.notes": "nyc was not working with this ES6 project"
 }
