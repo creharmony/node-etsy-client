@@ -105,6 +105,7 @@ dist
 
 # IntelliJ
 *.iml
+.idea/
 
 # drafts
 __*/
