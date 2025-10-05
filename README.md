@@ -130,22 +130,8 @@ During migration from v2 to v3 [#39](https://github.com/creharmony/node-etsy-cli
 - `variations values translations` related ticket: etsy/open-api#431 (bug)
 
 ## How to contribute
-You're not a dev ? just submit an issue (bug, improvements, questions). Or else:
-* Clone
-* Install deps
-* setup your test environment (cf. [initEnv.example.sh](./env/initEnv.example.sh))
-* Then mocha tests
-```
-git clone https://github.com/creharmony/node-etsy-client.git
-cd node-etsy-client
-npm install
-# play test without etsy endpoint
-npm run test
-# play test with etsy endpoint
-. ./env/initEnv.example.sh
-npm run test
-```
-* you could also fork, feature branch, then submit a pull request.
+
+cf. [CONTRIBUTING.md](.github/CONTRIBUTING.md)
 
 ### Services or activated bots
 
@@ -154,5 +140,4 @@ npm run test
 | ![CI/CD](https://github.com/creharmony/node-etsy-client/workflows/etsy_client_ci/badge.svg) |Github actions|Continuous tests + coverage using [c8](https://www.npmjs.com/package/c8).
 | [![scheduled npm audit](https://github.com/creharmony/node-etsy-client/actions/workflows/audit.yml/badge.svg)](https://github.com/creharmony/node-etsy-client/actions/workflows/audit.yml) |Github actions|Continuous vulnerability audit.
 | [<img src="https://cdn.icon-icons.com/icons2/2148/PNG/512/houndci_icon_132320.png" width="100">](https://houndci.com/)|[Houndci](https://houndci.com/)|JavaScript  automated review (configured by `.hound.yml`)|
-| [![Automated Release Notes by gren](https://img.shields.io/badge/%F0%9F%A4%96-release%20notes-00B2EE.svg)](https://github-tools.github.io/github-release-notes/)|[gren](https://github.com/github-tools/github-release-notes)|[Release notes](https://github.com/creharmony/node-etsy-client/releases) automation|
 |[<img src="https://codetheweb.blog/assets/img/posts/github-pages-free-hosting/cover.png" width="100">](https://creharmony.github.io/node-etsy-client/)| Github pages host some metrics for the main branch of this project: [code coverage](https://creharmony.github.io/node-etsy-client/)
