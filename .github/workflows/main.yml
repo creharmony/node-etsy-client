@@ -1,6 +1,5 @@
 # node-etsy-client continuous integration
-
-name: etsy_client_ci
+name: main
 
 # Controls when the action will run.
 on:
@@ -25,57 +24,76 @@ jobs:
     strategy:
       matrix:
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-        node-version: [18.x]
+        node-version: [ 18.x ]
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v5
 
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v2
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-        cache-dependency-path: |
-          package-lock.json
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
 
-    - name: Install dependencies
-      # - run: npm ci # need package.json.lock
-      run: |
-        npm run setup
-        npm install
-        echo "show outdated (if any)"
-        npm outdated --depth=3 || echo "you must think about update your dependencies :)"
+      - name: Install dependencies
+        run: |
+          echo ::group::Install dependencies
+          echo "install"
+          npm i
+          echo ::endgroup::
 
-    - name: Run ci-tests with code coverage
-      run: |
-        npm run ci-test
+      - name: CHECK - Check for outdated dependencies (non-blocking warning)
+        run: |
+          echo "🔍 Checking for outdated dependencies..."
+          if npm outdated --depth=3; then
+            echo "::notice title=Deps OK::✅ Dependencies are up to date 🎉"
+          else
+            echo "::warning title=ℹ️ Outdated Dependencies::Some dependencies are outdated. Please consider updating them."
+          fi
 
-    - name: Report coverage to the PR
-      continue-on-error: true
-      uses: romeovs/lcov-reporter-action@v0.2.16
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        lcov-file: ./coverage/lcov.info
+      - name: CHECK - Run inline npm audit (non-blocking warning)
+        run: |
+          echo "🔍 Checking for vulnerabilities..."
+          if npm audit; then
+            echo "::notice title=Audit OK::✅ Audit is fine 🎉"
+          else
+            echo "::warning title=ℹ️ vulnerabilities found"
+          fi
 
-    - name: Npm audit
-      uses: oke-py/npm-audit-action@v2
-      with:
-        audit_level: moderate
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        dedupe_issues: true
+      - name: Npm audit
+        uses: oke-py/npm-audit-action@v2
+        with:
+          audit_level: moderate
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          dedupe_issues: true
 
-    - name: Publish NpmJS package
-      if: github.ref == 'refs/heads/npmjs'
-      run: |
-        echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_DEPLOY_TOKEN }}" > .npmrc
-        npm whoami # rely on .npmrc
-        npm publish
+      - name: Run ci-tests with code coverage
+        run: |
+          npm run ci-test
 
-    - name: "Deploy Github Pages (code-coverage)"
-      if: github.ref == 'refs/heads/main'
-      uses: JamesIves/github-pages-deploy-action@v4
-      with:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        BRANCH: gh-pages
-        FOLDER: coverage/
+      - name: COVERAGE - Report coverage on pull request
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        # uses: romeovs/lcov-reporter-action@v0.2.16 # https://github.com/romeovs/lcov-reporter-action/issues/10
+        uses: andybelltree/lcov-reporter-action@v1.7.0 # https://github.com/andybelltree/lcov-reporter-action/releases
+        with:
+          lcov-file: ./coverage/lcov.info
+          filter-changed-files: true
+
+      - name: Publish NpmJS package
+        if: github.ref == 'refs/heads/npmjs'
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_DEPLOY_TOKEN }}" > .npmrc
+          npm whoami # rely on .npmrc
+          npm publish
+
+      - name: "Deploy Github Pages (code-coverage)"
+        if: github.ref == 'refs/heads/main'
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: gh-pages
+          folder: coverage/
