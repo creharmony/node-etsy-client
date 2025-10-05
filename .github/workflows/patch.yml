@@ -15,7 +15,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v5
         with:
-          ref: 'npmjs'
           token: ${{ secrets.GH_ACTIONS_TOKEN }}
 
       - name: Setup Node.js ${{ matrix.node-version }}
