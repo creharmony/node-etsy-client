@@ -43,6 +43,8 @@ jobs:
           echo ::group::Install dependencies
           echo "install"
           npm i
+          echo "setup : c8 required for coverage"
+          npm run setup
           echo ::endgroup::
 
       - name: CHECK - Check for outdated dependencies (non-blocking warning)
