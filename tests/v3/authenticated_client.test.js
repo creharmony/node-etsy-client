@@ -1,13 +1,9 @@
 import winston from 'winston';
+import {expect, should} from "chai";
 import EtsyClientV3 from '../../src/EtsyClientV3.js';
-
-import chai from 'chai';
-
-const should = chai.should;
-const expect = chai.expect;
-chai.should();
-
 const winstonTransports = [new winston.transports.Console({format: winston.format.simple()})];
+
+should();
 const logger = winston.createLogger({transports: winstonTransports});
 const productsLimit = 5;
 const imagesLimit = 5;

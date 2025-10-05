@@ -1,12 +1,8 @@
 import winston from 'winston';
+import {expect, should} from "chai";
 import EtsyClientV3 from '../../src/EtsyClientV3.js';
 
-import chai from 'chai';
-
-const should = chai.should;
-const expect = chai.expect;
-chai.should();
-
+should();
 const winstonTransports = [new winston.transports.Console({format: winston.format.simple()})];
 const logger = winston.createLogger({transports: winstonTransports});
 

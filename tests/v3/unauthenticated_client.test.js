@@ -1,12 +1,8 @@
+import {expect, should} from "chai";
 import EtsyClientV3 from '../../src/EtsyClientV3.js';
 import OAuth2Service from '../../src/OAuth2Service.js';
 
-import chai from 'chai';
-
-const should = chai.should;
-const expect = chai.expect;
-chai.should();
-
+should();
 const FAKE_API_KEY = "ultraSecretRightHere";
 const FAKE_TOKEN = "ultraSecretRightHereBis";
 const shop_name = "mony";
