@@ -12,6 +12,7 @@
     "simpleTest": "mocha tests/mytest.js",
     "wip3": "mocha --timeout 120000 tests/manual/tmpV3ListingActive.dontpush.test.js",
     "variation": "mocha --timeout 120000 tests/manual/tmpV3Variation.dontpush.test.js",
+    "authtest": "mocha --timeout 120000 tests/v3/authenticated_client.test.js",
     "test": "mocha --timeout 120000 tests/v3/*.test.js",
     "manual": "mocha tests/manual/*.test.js",
     "manualV3": "mocha tests/v3/un*.test.js",

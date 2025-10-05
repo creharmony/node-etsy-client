@@ -71,6 +71,11 @@ class EtsyClientV3 {
      this._assumeShopId();
      return this.limitedEtsyApiFetch(`/shops/${this.shopId}/sections`, options);
   }
+  // https://developers.etsy.com/documentation/reference#operation/getReviewsByShop
+  getShopReviews(options) {
+     this._assumeShopId();
+     return this.limitedEtsyApiFetch(`/shops/${this.shopId}/reviews`, options);
+  }
 
   // https://developers.etsy.com/documentation/reference/#operation/findAllActiveListingsByShop
   findAllActiveListingsByShop(options) {
