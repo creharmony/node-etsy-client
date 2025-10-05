@@ -12,14 +12,14 @@ jobs:
         node-version: [18.x]
 
     steps:
-      - name: Git checkout
-        uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v5
         with:
           ref: 'npmjs'
           token: ${{ secrets.GH_ACTIONS_TOKEN }}
 
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v2
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v5
         with:
           node-version: ${{ matrix.node-version }}
 
