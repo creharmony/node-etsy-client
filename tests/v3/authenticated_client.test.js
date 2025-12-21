@@ -1,6 +1,8 @@
 import winston from 'winston';
 import {expect, should} from "chai";
 import EtsyClientV3 from '../../src/EtsyClientV3.js';
+import {isSet} from "../../src/commonsUtils.js";
+
 const winstonTransports = [new winston.transports.Console({format: winston.format.simple()})];
 
 should();
@@ -144,7 +146,7 @@ if (apiKey) {
             });
         }
 
-        if (testPlan.shopListing) {
+        if (isSet(listingId) && testPlan.shopListing) {
             it("should get shop listing", async function () {
 
                 logger.info(" - [getListing] get shop listing ", {'listingId': listingId});
@@ -163,7 +165,7 @@ if (apiKey) {
             });
         }
 
-        if (testPlan.shopListingVariationImages) {
+        if (isSet(listingId) && testPlan.shopListingVariationImages) {
             it("should get shop listing variation images", async function () {
 
                 logger.info(" - [getListingVariationImages] get first product related images ", {
@@ -184,7 +186,7 @@ if (apiKey) {
             });
         }
 
-        if (testPlan.shopListingImages) {
+        if (isSet(listingId) && testPlan.shopListingImages) {
             it("should get shop listing images", async function () {
 
                 logger.info(" - [getListingImages] get first product related images ", {
@@ -206,7 +208,7 @@ if (apiKey) {
             });
         }
 
-        if (testPlan.shopListingProperties) {
+        if (isSet(listingId) && testPlan.shopListingProperties) {
             it("should get shop listing properties", async function () {
 
                 logger.info(" - [getListingProperty] get first product related properties ", {listingId});
