@@ -36,7 +36,7 @@ using apiKey + OAuth token:
 
 First declare your api key:
 ```
-export ETSY_API_KEY=xxxxxxxxxxx
+export ETSY_API_KEY=your_key:your_secret
 ```
 
 install node-etsy-client:
@@ -59,7 +59,7 @@ You could play Mocha tests to get more examples (cf. next section).
 
 You could avoid using environment variable by using constructor options:
 ```
-var client = new EtsyClientV3({apiKey:'mSecretHere'});
+var client = new EtsyClientV3({apiKey:'your_key:your_secret'});
 ```
 
 ## Advanced usage
@@ -72,6 +72,24 @@ To print out in the console the API call and response:
 export ETSY_DEBUG=true
 ```
 
+### ApiKey format and Silence API key format warning
+
+> ⚠️ **Important: API Key Format Change (January 18, 2026)**  
+> Starting January 18, 2026, Etsy requires all API keys to include a shared secret.  
+> Format: `keystring:shared_secret` (e.g., `export ETSY_API_KEY=your_key:your_secret`)  
+> Find your shared secret at: https://www.etsy.com/developers/your-apps  
+> Documentation: https://developer.etsy.com/documentation/essentials/requests
+>
+> If your API key doesn't include the `:` separator, you'll see a warning message.  
+> To silence this warning: `export ETSY_SILENT_API_KEY_WARNING=true`
+
+If you're still using the old API key format (without shared secret) and want to suppress the warning message:
+```bash
+export ETSY_SILENT_API_KEY_WARNING=true
+```
+
+Note: This is temporary - you must migrate to the new format before January 18, 2026.
+
 ### Etsy client options
 This section describes EtsyClientV2/EtsyClientV3 available options.
 
@@ -82,16 +100,17 @@ Note about options precedence:
 
 Options:
 
-| Name      |                                                                   Description                                                                   |
-|----------|:-----------------------------------------------------------------------------------------------------------------------------------------------:|
-| `apiUrl` |     Etsy API endpoint - (or env.`ETSY_API_ENDPOINT`) default value is (v2)`https://openapi.etsy.com/v2` / (v3)`https://openapi.etsy.com/v3`     |
-| `apiKey` | Etsy API key - **required** (or env.`ETSY_API_KEY`) without default value. Ask one from [Etsy portal](https://www.etsy.com/developers/register) |
-| `shopId` |                                     Etsy shop id - *optional* (or env.`ETSY_SHOP_ID`) without default value                                     |
-| `lang`   |                              Etsy language - *optional* (or env.`ETSY_LANG`) without default value. Example: `fr`                               |
-| `ETSY_DRY_MODE`) with default value |                                                                     `false`   |
-| `dryMode`   |                  print call instead of making real etsy call - *optional* (or env.`ETSY_DRY_MODE`) with default value: `false`                  |
-| `etsyRateWindowSizeMs` |              Rate limit windows size in milliseconds - *optional* (or env.`ETSY_RATE_WINDOWS_SIZE_MS`) with default value: `1000`               |
-| `etsyRateMaxQueries` |                    Rate limit max query per windows size - *optional* (or env.`ETSY_RATE_MAX_QUERIES`) without default value                    |
+| Name                   | Description                                                                                                                             |
+|------------------------|:----------------------------------------------------------------------------------------------------------------------------------------|
+| `apiUrl`               | Etsy API endpoint - (or env.`ETSY_API_ENDPOINT`) default value is (v2)`https://openapi.etsy.com/v2` / (v3)`https://openapi.etsy.com/v3` |
+| `apiKey`               | Etsy API key - **required** (or env.`ETSY_API_KEY`) without default value. Format: `keystring:shared_secret` (*)                        |
+| `shopId`               | Etsy shop id - *optional* (or env.`ETSY_SHOP_ID`) without default value                                                                 |
+| `lang`                 | Etsy language - *optional* (or env.`ETSY_LANG`) without default value. Example: `fr`                                                    |
+| `dryMode`              | print call instead of making real etsy call - *optional* (or env.`ETSY_DRY_MODE`) with default value: `false`                           |
+| `etsyRateWindowSizeMs` | Rate limit windows size in milliseconds - *optional* (or env.`ETSY_RATE_WINDOWS_SIZE_MS`) with default value: `1000`                    |
+| `etsyRateMaxQueries`   | Rate limit max query per windows size - *optional* (or env.`ETSY_RATE_MAX_QUERIES`) without default value                               |
+
+(*) shared_secret is mandatory from Jan 18, 2026. Ask one from [Etsy portal](https://www.etsy.com/developers/register).
 
 Note about rate limit options:
 
@@ -116,7 +135,7 @@ To apply rate limit of 10 query per seconds (with wait on unavailable slot),
 add `etsyRateMaxQueries` option:
 
 ```
-var client = new EtsyClientV2({apiKey:'mSecretHere', etsyRateMaxQueries:10});
+var client = new EtsyClientV2({apiKey:'your_key:your_secret', etsyRateMaxQueries:10});
 ```
 
 ## Note about ETSY API versions
@@ -135,9 +154,10 @@ cf. [CONTRIBUTING.md](.github/CONTRIBUTING.md)
 
 ### Services or activated bots
 
-| badge  | name   | description  |
-|--------|-------|:--------|
-| ![CI/CD](https://github.com/creharmony/node-etsy-client/workflows/main/badge.svg) |Github actions|Continuous tests + coverage using [c8](https://www.npmjs.com/package/c8).
-| [![scheduled npm audit](https://github.com/creharmony/node-etsy-client/actions/workflows/audit.yml/badge.svg)](https://github.com/creharmony/node-etsy-client/actions/workflows/audit.yml) |Github actions|Continuous vulnerability audit.
-| [<img src="https://cdn.icon-icons.com/icons2/2148/PNG/512/houndci_icon_132320.png" width="100">](https://houndci.com/)|[Houndci](https://houndci.com/)|JavaScript  automated review (configured by `.hound.yml`)|
-|[<img src="https://codetheweb.blog/assets/img/posts/github-pages-free-hosting/cover.png" width="100">](https://creharmony.github.io/node-etsy-client/)| Github pages host some metrics for the main branch of this project: [code coverage](https://creharmony.github.io/node-etsy-client/)
+![CI/CD](https://github.com/creharmony/node-etsy-client/workflows/main/badge.svg) **Github actions** - Continuous tests + coverage using [c8](https://www.npmjs.com/package/c8)
+
+[![scheduled npm audit](https://github.com/creharmony/node-etsy-client/actions/workflows/audit.yml/badge.svg)](https://github.com/creharmony/node-etsy-client/actions/workflows/audit.yml) **Github actions** - Continuous vulnerability audit
+
+**[Houndci](https://houndci.com/)** - JavaScript automated review (configured by `.hound.yml`)
+
+**[Github pages](https://creharmony.github.io/node-etsy-client/)** - Host metrics for main branch: [code coverage](https://creharmony.github.io/node-etsy-client/)

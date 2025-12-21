@@ -4,6 +4,7 @@ import OAuth2Service from '../../src/OAuth2Service.js';
 
 should();
 const FAKE_API_KEY = "ultraSecretRightHere";
+const FAKE_API_KEY_SECRET = "ultraSecretRightHere:secretHere";
 const FAKE_TOKEN = "ultraSecretRightHereBis";
 const shop_name = "mony";
 
@@ -18,6 +19,15 @@ if (!process.env.ETSY_API_KEY) {
         });
 
         it("should not report api key in error case", async function () {
+            // Capture console.warn
+            const originalWarn = console.warn;
+            let warnCalled = false;
+            let warnMessage = '';
+            console.warn = (msg) => {
+                warnCalled = true;
+                warnMessage = msg;
+            };
+
             const client = new EtsyClientV3({
                 apiTimeoutMs: 100,
                 apiKey: FAKE_API_KEY,
@@ -25,6 +35,16 @@ if (!process.env.ETSY_API_KEY) {
                 apiUrl: "https://IAmNotEtsyEndpoint.com",
                 shopId: 123456
             });
+
+            // Restore console.warn
+            console.warn = originalWarn;
+
+            // Check that warning was displayed for invalid format
+            expect(warnCalled).to.be.true;
+            expect(warnMessage).to.include('ETSY API KEY FORMAT WARNING');
+            expect(warnMessage).to.include('January 18, 2026');
+            expect(warnMessage).to.include('keystring:secret');
+
             const shops = await client.getListingsByShop()
                 .catch(findShopsError => {
                     expect("" + findShopsError).to.not.include(FAKE_API_KEY);
@@ -33,7 +53,7 @@ if (!process.env.ETSY_API_KEY) {
 
         it("should not report api key in error case (with rate limit)", async function () {
             const client = new EtsyClientV3({
-                apiKey: FAKE_API_KEY,
+                apiKey: FAKE_API_KEY_SECRET,
                 accessToken: FAKE_TOKEN,
                 apiUrl: "https://IAmNotEtsyEndpoint.com",
                 etsyRateMaxQueries: 10,
@@ -41,7 +61,7 @@ if (!process.env.ETSY_API_KEY) {
             });
             const shops = await client.getListingsByShop()
                 .catch(findShopsError => {
-                    expect("" + findShopsError).to.not.include(FAKE_API_KEY);
+                    expect("" + findShopsError).to.not.include(FAKE_API_KEY_SECRET);
                 })
         });
 
@@ -141,7 +161,7 @@ if (!process.env.ETSY_API_KEY) {
 
         it("should provide oAuth2 connect url", async function () {
             const oauth = new OAuth2Service();
-            const client_id = FAKE_API_KEY;
+            const client_id = FAKE_API_KEY_SECRET;
             const redirect_uri = "https://www.exemple.com/mycallback";
 
             // WHEN
@@ -154,13 +174,13 @@ if (!process.env.ETSY_API_KEY) {
             expect(result).to.have.property('connectUrl');
 
             expect(result.connectUrl).to.include("https%3A%2F%2Fwww.exemple.com%2Fmycallback");
-            expect(result.connectUrl).to.include(FAKE_API_KEY);
+            expect(result.connectUrl).to.include(encodeURIComponent(FAKE_API_KEY_SECRET));
             expect(result.connectUrl).to.include("response_type=code");
         });
 
         it("should try error asking oAuth2 token", async function () {
             const oauth = new OAuth2Service();
-            const client_id = FAKE_API_KEY;
+            const client_id = FAKE_API_KEY_SECRET;
             const code = "wrong one";
             const code_verifier = "yet another fake one";
             const redirect_uri = "https://www.exemple.com/mycallback";
@@ -180,7 +200,7 @@ if (!process.env.ETSY_API_KEY) {
 
         it("should try error asking to refresh oAuth2 token", async function () {
             const oauth = new OAuth2Service();
-            const client_id = FAKE_API_KEY;
+            const client_id = FAKE_API_KEY_SECRET;
             const refresh_token = "yet another fake one";
 
             // WHEN
@@ -198,7 +218,7 @@ if (!process.env.ETSY_API_KEY) {
 }
 
 function enrichOptionsWithTestConfiguration(options) {
-    options.apiKey = FAKE_API_KEY;
+    options.apiKey = FAKE_API_KEY_SECRET;
     options.apiTimeoutMs = 100;
     options.apiUrl = "https://IAmNotEtsyEndpoint.com";
     options.shop = "MyShop";

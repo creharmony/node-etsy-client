@@ -1,0 +1,1 @@
+export const isSet = (val) => val !== undefined && val !== null && val !== "";
