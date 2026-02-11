@@ -4,6 +4,9 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -13,12 +16,12 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           token: ${{ secrets.GH_ACTIONS_TOKEN }}
 
       - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node-version }}
 
@@ -31,3 +34,20 @@ jobs:
           npm version patch
           git branch -f npmjs
           git push origin main npmjs --tags
+
+      - name: Create draft release from package.json
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_ACTIONS_TOKEN }}
+        run: |
+          # Extract version from package.json
+          VERSION=$(node -p "require('./package.json').version")
+       
+          echo "🔖 Creating draft release for version v$VERSION"
+       
+          # Check if release already exists
+          if gh release view "v$VERSION" > /dev/null 2>&1; then
+            echo "::warning title=ℹ️ Release v$VERSION already exists, skipping."
+          else
+            gh release create "v$VERSION" --draft --generate-notes
+            echo "::notice title=✅ Draft release v$VERSION created."
+          fi
