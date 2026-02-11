@@ -1,3 +1,14 @@
 {
-  "esversion": 6
+  "esversion": 11,
+  "module": true,
+  "node": true,
+  "mocha": true,
+  "globals": {
+    "describe": false,
+    "it": false,
+    "before": false,
+    "after": false,
+    "beforeEach": false,
+    "afterEach": false
+  }
 }

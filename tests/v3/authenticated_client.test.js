@@ -84,7 +84,7 @@ if (apiKey) {
                 logger.info(" - [getShop] get shop details for ", {'shopId': client.shopId});
                 var shopDetails = await client.getShop()
                     .catch(err => console.log("getShop err", err));
-                logger.info(" * getShop shop_name", {'shop_name': shopDetails.shop_name})
+                logger.info(" * getShop shop_name", {'shop_name': shopDetails.shop_name});
 
             });
         }
@@ -101,7 +101,7 @@ if (apiKey) {
                     shopSections.results.forEach(element => {
                         logger.info(" * #" + element.shop_section_id + " (rank:" + element.rank + ") " + element.title +
                             " - count:" + element.active_listing_count);
-                    })
+                    });
                 }
 
             });
@@ -140,9 +140,14 @@ if (apiKey) {
                 activeListings.results.forEach(element => {
                     logger.info(" * #" + element.listing_id + " (" + element.quantity + ") " + element.title +
                         " - " + element.price.amount / element.price.divisor + " " + element.price.currency_code);
-                })
+                });
 
                 listingId = listingId === null ? activeListings.results[0].listing_id : listingId;
+                if (!isSet(listingId)) {
+                    logger.info("no active listing (no listing or shop in holliday ?)");
+                } else {
+                    logger.info(`pick first active listing ${listingId}`);
+                }
             });
         }
 
@@ -180,7 +185,7 @@ if (apiKey) {
                 } else {
                     getListingVariationImages.results.forEach(element => {
                         logger.info(" - prop#" + element.property_id + " value#" + element.value_id + " >" + element.value + " image #" + element.image_id);
-                    })
+                    });
                 }
 
             });
@@ -202,7 +207,7 @@ if (apiKey) {
                     getListingImages.results.forEach(element => {
                         logger.info(" - #" + element.listing_image_id + " (" + element.full_height + "x" + element.full_width + ") " +
                             element.url_fullxfull);
-                    })
+                    });
                 }
 
             });
@@ -220,7 +225,7 @@ if (apiKey) {
                 } else {
                     getListingProperty.results.forEach(element => {
                         logger.info("property:" + JSON.stringify(element));
-                    })
+                    });
                 }
 
             });
