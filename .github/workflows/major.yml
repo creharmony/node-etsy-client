@@ -33,7 +33,7 @@ jobs:
           git checkout main
           npm version major
           git branch -f npmjs
-          git push origin main npmjs --tags
+          git push -f origin main npmjs --tags
 
       - name: Create draft release from package.json
         env:
