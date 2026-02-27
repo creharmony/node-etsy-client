@@ -85,7 +85,7 @@ jobs:
           lcov-file: ./coverage/lcov.info
           filter-changed-files: true
 
-      - name: Publish NpmJS package
+      - name: Publish NpmJS package with NPM_DEPLOY_TOKEN
         if: github.ref == 'refs/heads/npmjs'
         run: |
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_DEPLOY_TOKEN }}" > .npmrc
