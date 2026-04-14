@@ -35,13 +35,13 @@
 - **Assertion**: Chai
 - **Coverage**: c8 (configured in `.c8rc`)
 - **Test location**: `tests/v3/*.test.js`, `tests/mytest.js`
-- **Run**: `npm run test` (all V3 tests), `npm run simpleTest` (mytest.js)
+- **Run**: `pnpm run test` (all V3 tests), `pnpm run simpleTest` (mytest.js)
 - **Manual/WIP tests**: `tests/manual/*.test.js` (not in CI by default)
 
 ## Security & Dependencies
 
 ### Audit Status
-- **Target**: `npm audit` = 0 vulnerabilities
+- **Target**: `pnpm audit` = 0 vulnerabilities
 - cf package.json for dependencies
 
 ## Directory Structure
@@ -104,7 +104,7 @@ git commit -m "docs: update OAuth2 setup guide"
 1. **Prefer MCP IntelliJ** for file edits (JSON/package.json restrictions)
 2. **Read before editing**: Always read full context; trace imports/exports
 3. **Auto-doc rule**: If code is clear, don't force docs; use inline comments sparingly
-4. **Test after change**: Run `npm run simpleTest` or `npm run test` before confirming
+4. **Test after change**: Run `pnpm run simpleTest` or `source ./env/initEnv.dontpush.sh && pnpm run test` before confirming
 5. **English-only**: Code, commits, meaningful comments in English
-6. **Security-first**: Any dependency change must be validated with `npm audit`
+6. **Security-first**: Any dependency change must be validated with `pnpm audit`
 
