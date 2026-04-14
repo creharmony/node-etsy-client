@@ -1,6 +1,6 @@
 {
   "name": "node-etsy-client",
-  "version": "2.1.2",
+  "version": "2.1.3",
   "description": "node-etsy-client",
   "main": "./lib/export.js",
   "types": "./lib/export.d.ts",
@@ -38,7 +38,14 @@
   ],
   "copyright": {
     "title": "node-etsy-client",
-    "years": [2021,2022,2023,2024,2025,2026],
+    "years": [
+      2021,
+      2022,
+      2023,
+      2024,
+      2025,
+      2026
+    ],
     "author": "Brice Vandeputte"
   },
   "dependencies": {
