@@ -54,8 +54,12 @@
   },
   "devDependencies": {
     "chai": "^6.2.0",
-    "mocha": "^11.7.4",
-    "npm-force-resolutions": "^0.0.10"
+    "mocha": "^11.3.0",
+    "npm-force-resolutions": "^0.0.10",
+    "serialize-javascript": "^7.0.5"
+  },
+  "overrides": {
+    "serialize-javascript": "^7.0.5"
   },
   "resolutions": {},
   "jshintConfig": {
