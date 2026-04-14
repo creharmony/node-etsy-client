@@ -5,9 +5,10 @@
   "main": "./lib/export.js",
   "types": "./lib/export.d.ts",
   "type": "module",
+  "packageManager": "pnpm@10.33.0",
   "scripts": {
-    "audit": "npm audit&&npm outdated --depth=3",
-    "setup": "npm install -g c8",
+    "audit": "pnpm audit && pnpm outdated --depth=3",
+    "setup": "pnpm add -g c8",
     "testV3": "c8 --reporter text --reporter=lcov --lines 66 mocha tests/v3/*.test.js",
     "simpleTest": "mocha tests/mytest.js",
     "wip3": "mocha --timeout 120000 tests/manual/tmpV3ListingActive.dontpush.test.js",
@@ -16,7 +17,7 @@
     "test": "mocha --timeout 120000 tests/v3/*.test.js",
     "manual": "mocha tests/manual/*.test.js",
     "manualV3": "mocha tests/v3/un*.test.js",
-    "ci-test": "c8 npm run test"
+    "ci-test": "c8 pnpm run test"
   },
   "private": false,
   "author": "Boly38 <boly38@gmail.com>",
@@ -37,13 +38,7 @@
   ],
   "copyright": {
     "title": "node-etsy-client",
-    "years": [
-      2021,
-      2022,
-      2023,
-      2024,
-      2025
-    ],
+    "years": [2021,2022,2023,2024,2025,2026],
     "author": "Brice Vandeputte"
   },
   "dependencies": {

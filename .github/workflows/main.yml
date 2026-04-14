@@ -28,69 +28,74 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v5
+        with:
+          # version from package.json
+          run_install: false
 
       - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'npm'
-          cache-dependency-path: |
-            package-lock.json
+          cache: 'pnpm'
 
       - name: Install dependencies
         run: |
           echo ::group::Install dependencies
           echo "install"
-          npm i
+          pnpm install
           echo "setup : c8 required for coverage"
-          npm run setup
+          pnpm run setup
           echo ::endgroup::
 
       - name: CHECK - Check for outdated dependencies (non-blocking warning)
         run: |
           echo "🔍 Checking for outdated dependencies..."
-          if npm outdated --depth=3; then
+          if pnpm outdated --depth=3; then
             echo "::notice title=Deps OK::✅ Dependencies are up to date 🎉"
           else
             echo "::warning title=ℹ️ Outdated Dependencies::Some dependencies are outdated. Please consider updating them."
           fi
 
-      - name: CHECK - Run inline npm audit (non-blocking warning)
+      - name: CHECK - pnpm audit inline (prod deps only)
+        if: ${{ github.actor == 'dependabot[bot]' || !(github.event_name == 'pull_request') }}
         run: |
-          echo "🔍 Checking for vulnerabilities..."
-          if npm audit; then
-            echo "::notice title=Audit OK::✅ Audit is fine 🎉"
-          else
-            echo "::warning title=ℹ️ vulnerabilities found"
-          fi
+          pnpm audit --prod --audit-level=high > audit.txt && echo "::info::✅ No vulnerabilities found" || (echo "::warning::❌ Vulnerabilities found";cat audit.txt)
 
-      - name: Npm audit
-        uses: oke-py/npm-audit-action@v2
+      - name: CHECK - pnpm audit and comment on PR
+        if: ${{ github.actor != 'dependabot[bot]' && github.event.pull_request }}
+        uses: JamesRobertWiseman/pnpm-audit@v3.2.0
         with:
-          audit_level: moderate
+          prod: true
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          dedupe_issues: true
+          level: moderate   # 'low'|'moderate'|'high'|'critical'
+          fails: false # true to fail the build if vulnerabilities are found
+          single_comment: true # true to only post one comment
+          inline: true # true to emit audit findings directly in the workflow logs using GitHub annotation syntax
 
       - name: Run ci-tests with code coverage
         run: |
           npm run ci-test
 
       - name: COVERAGE - Report coverage on pull request
-        if: github.event_name == 'pull_request'
+        if: ${{ github.actor != 'dependabot[bot]' && github.event.pull_request }}
         continue-on-error: true
         # uses: romeovs/lcov-reporter-action@v0.2.16 # https://github.com/romeovs/lcov-reporter-action/issues/10
-        uses: andybelltree/lcov-reporter-action@v1.7.0 # https://github.com/andybelltree/lcov-reporter-action/releases
+        uses: andybelltree/lcov-reporter-action@v1.7.0
         with:
-          lcov-file: ./coverage/lcov.info
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          lcov-file: coverage/lcov.info
           filter-changed-files: true
 
       - name: Publish NpmJS package with NPM_DEPLOY_TOKEN
         if: github.ref == 'refs/heads/npmjs'
         run: |
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_DEPLOY_TOKEN }}" > .npmrc
-          npm whoami # rely on .npmrc
-          npm publish
+          pnpm whoami
+          pnpm publish
 
       - name: "Deploy Github Pages (code-coverage)"
         if: github.ref == 'refs/heads/main'
