@@ -1,8 +1,6 @@
 import EtsyClientV3 from '../src/EtsyClientV3.js';
 
-import chai from 'chai';
-const should = chai.should;
-const expect = chai.expect;
+import { expect } from 'chai';
 
 const FAKE_API_KEY = "ultraSecretRightHere";
 const shop_name = "mony";
