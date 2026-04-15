@@ -1,0 +1,3 @@
+public-hoist-pattern[]=*serialize-javascript*
+public-hoist-pattern[]=*diff*
+
