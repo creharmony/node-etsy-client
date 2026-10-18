@@ -91,12 +91,10 @@ jobs:
           lcov-file: coverage/lcov.info
           filter-changed-files: true
 
-      - name: Publish NpmJS package with NPM_DEPLOY_TOKEN
+      - name: Remind maintainers to publish manually to npmjs
         if: github.ref == 'refs/heads/npmjs'
         run: |
-          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_DEPLOY_TOKEN }}" > .npmrc
-          pnpm whoami
-          pnpm publish --no-git-checks
+          echo "::warning title=Manual npm publication required::To publish this version, check out the corresponding version tag locally, run npm login, then npm publish and complete the 2FA verification."
 
       - name: "Deploy Github Pages (code-coverage)"
         if: github.ref == 'refs/heads/main'
