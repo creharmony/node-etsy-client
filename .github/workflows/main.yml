@@ -47,8 +47,6 @@ jobs:
           echo ::group::Install dependencies
           echo "install"
           pnpm install
-          echo "setup : c8 required for coverage"
-          pnpm run setup
           echo ::endgroup::
 
       - name: CHECK - Check for outdated dependencies (non-blocking warning)
