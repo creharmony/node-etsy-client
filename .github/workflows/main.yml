@@ -67,6 +67,9 @@ jobs:
 
       - name: CHECK - pnpm audit and comment on PR
         if: ${{ github.actor != 'dependabot[bot]' && github.event.pull_request }}
+        # A fork PR may not have permission to comment with GITHUB_TOKEN.
+        # Audit reporting must not prevent tests and coverage from running.
+        continue-on-error: true
         uses: JamesRobertWiseman/pnpm-audit@v3.2.0
         with:
           prod: true
