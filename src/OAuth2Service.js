@@ -104,13 +104,10 @@ class OAuth2Service {
           } else {
             throw response;
           }
-        })
-        .catch(result => {
-           const status = result.status;
-           const json = result.response.data;
-           OAUTH_DEBUG && console.log({status, json})
-           reject(json);
-        });
+         })
+         .catch(result => {
+            reject(handleOAuthError(result));
+         });
 
       });
 
@@ -134,13 +131,10 @@ class OAuth2Service {
           } else {
             throw response;
           }
-        })
-        .catch(result => {
-           const status = result.status;
-           const json = result.response.data;
-           OAUTH_DEBUG && console.log({status, json})
-           reject(json);
-        });
+         })
+         .catch(result => {
+            reject(handleOAuthError(result));
+         });
 
       });
     }
@@ -165,3 +159,25 @@ const generateVerifier = () => base64URLEncode(crypto.randomBytes(32));
 const generateS256Challenge = (verifier) => base64URLEncode(sha256(verifier));
 
 const nowSec = () => Math.floor(Date.now() / 1000); // second since 1 jan 70
+
+const handleOAuthError = (result) => {
+  const response = result && result.response;
+  if (response && response.data !== undefined) {
+    const status = response.status ?? result.status;
+    OAUTH_DEBUG && console.log({status, json: response.data});
+    return response.data;
+  }
+
+  const error = new Error(result?.message || 'OAuth token request failed');
+  if (result?.code !== undefined) {
+    error.code = result.code;
+  }
+  if (result?.status !== undefined) {
+    error.status = result.status;
+  }
+  error.cause = result;
+  OAUTH_DEBUG && console.log({status: error.status, code: error.code, message: error.message});
+  return error;
+};
+
+export {handleOAuthError};

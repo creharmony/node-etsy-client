@@ -1,6 +1,6 @@
 import {expect, should} from "chai";
 import EtsyClientV3 from '../../src/EtsyClientV3.js';
-import OAuth2Service from '../../src/OAuth2Service.js';
+import OAuth2Service, {handleOAuthError} from '../../src/OAuth2Service.js';
 
 should();
 const FAKE_API_KEY = "ultraSecretRightHere";
@@ -212,6 +212,28 @@ if (!process.env.ETSY_API_KEY) {
                     expect(err.error).to.be.eql("Invalid API key: should be in the format 'keystring:shared_secret'.");
 
                 });
+        });
+
+        it("should preserve the response data for an OAuth HTTP error", function () {
+            const responseData = {error: "invalid_grant"};
+
+            const error = handleOAuthError({
+                response: {status: 400, data: responseData}
+            });
+
+            expect(error).to.equal(responseData);
+        });
+
+        it("should preserve the root cause for an OAuth network error", function () {
+            const networkError = new Error("getaddrinfo ENOTFOUND proxy.example.com");
+            networkError.code = "ENOTFOUND";
+
+            const error = handleOAuthError(networkError);
+
+            expect(error).to.be.instanceOf(Error);
+            expect(error.message).to.equal(networkError.message);
+            expect(error.code).to.equal("ENOTFOUND");
+            expect(error.cause).to.equal(networkError);
         });
 
     });
