@@ -47,7 +47,9 @@ Think about environment setup.
 ## HowTo create a fresh version
 - use patch or minor or major workflow
 
-this will make a new version and on version tag, the main ci workflow will push a new npmjs version too.
+This will make a new version. The main CI workflow displays a warning reminding maintainers to publish
+manually to npmjs. Check out the corresponding version tag locally, run `npm login`, then `npm publish`
+and complete the 2FA verification.
 
 ## HowTo release using `gh`
 
