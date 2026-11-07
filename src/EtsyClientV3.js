@@ -6,6 +6,10 @@ import {isSet} from "./commonsUtils.js";
 const DEFAULT_DRY_MODE = false;// DEBUG // if true, then print get onto console instead of calling etsy
 const SILENT_API_KEY_FORMAT_WARNING = process.env.ETSY_SILENT_API_KEY_WARNING === "true" || process.env.ETSY_SILENT_API_KEY_WARNING === "1";
 const API_KEY_FORMAT_WARNED = { warned: false }; // singleton to warn only once
+const MAX_API_ATTEMPTS = 3;
+// Node.js timers cap each delay at 2^31 - 1 ms; longer waits are split into chunks.
+const MAX_TIMEOUT_MS = 2147483647;
+const RETRY_AFTER_MS = Symbol("retryAfterMs");
 
 /**
  * this utility class implement ETSY (some) methods documented here:
@@ -214,15 +218,59 @@ class EtsyClientV3 {
     //~ rate limit and api utility tools under
 
     limitedEtsyApiFetch(endpoint, options) {
-        var client = this;
-        if (!client.isRateLimitEnabled()) {
-            return client.safeEtsyApiFetch(endpoint, options);
-        } else {
-            return new Promise(async function (resolve, reject) {
-                await client.limiter.limitedCall(() => client.safeEtsyApiFetch(endpoint, options))
-                    .then(resolve).catch(reject);
-            });
+        return this._fetchWithRetry(endpoint, options);
+    }
+
+    async _fetchWithRetry(endpoint, options, attempt = 1) {
+        try {
+            const fetch = () => this.safeEtsyApiFetch(endpoint, options);
+            return await (this.isRateLimitEnabled() ? this.limiter.limitedCall(fetch) : fetch());
+        } catch (error) {
+            const retryAfterMs = error?.[RETRY_AFTER_MS];
+            if (attempt >= MAX_API_ATTEMPTS || retryAfterMs === undefined) {
+                throw error;
+            }
+            await this._waitForRetry(retryAfterMs);
+            return this._fetchWithRetry(endpoint, options, attempt + 1);
         }
+    }
+
+    async _waitForRetry(delayMs) {
+        const deadline = performance.now() + delayMs;
+        while (true) {
+            const remainingMs = deadline - performance.now();
+            if (remainingMs <= 0) {
+                return;
+            }
+            await new Promise(resolve => setTimeout(resolve, Math.min(remainingMs, MAX_TIMEOUT_MS)));
+        }
+    }
+
+    _retryAfterDelay(headers) {
+        if (!headers) {
+            return null;
+        }
+
+        let retryAfter;
+        if (typeof headers.get === "function") {
+            retryAfter = headers.get("Retry-After");
+        }
+        if (retryAfter === undefined || retryAfter === null) {
+            const headerName = Object.keys(headers).find(header => header.toLowerCase() === "retry-after");
+            if (headerName !== undefined) {
+                retryAfter = headers[headerName];
+            }
+        }
+        if (typeof retryAfter !== "string") {
+            return null;
+        }
+
+        const value = retryAfter.trim();
+        if (!/^\d+$/.test(value)) {
+            return null;
+        }
+        const delayMs = Number(value) * 1000;
+        return Number.isFinite(delayMs) ? delayMs : null;
     }
 
     safeEtsyApiFetch(endpoint, options) {
@@ -252,6 +300,12 @@ class EtsyClientV3 {
                     if (requestError.response) {
                         client.secureErrorAttribute(secureError, requestError.response, "status");
                         client.secureErrorAttribute(secureError, requestError.response, "data", "details");
+                        if (requestError.response.status === 429) {
+                            const retryAfterMs = client._retryAfterDelay(requestError.response.headers);
+                            if (retryAfterMs !== null) {
+                                Object.defineProperty(secureError, RETRY_AFTER_MS, {value: retryAfterMs});
+                            }
+                        }
                         const requestId = client._etsyRequestId(requestError.response.headers);
                         if (requestId !== undefined && requestId !== null) {
                             secureError.requestId = client.secureAttributeValue(requestId);
