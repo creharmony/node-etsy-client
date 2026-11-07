@@ -189,24 +189,89 @@ class EtsyClientV3 {
             client.nodeAxios(requestEndpoint, headers)
                 .then(response => EtsyClientV3._response(response, resolve, reject))
                 .catch(requestError => {
-                    EtsyClientV3.debug && console.log(`request err ${JSON.stringify(requestError)}`);
                     const secureError = {};
                     client.secureErrorAttribute(secureError, requestError, "message");
                     client.secureErrorAttribute(secureError, requestError, "code");
+                    if (requestError.response) {
+                        client.secureErrorAttribute(secureError, requestError.response, "status");
+                        client.secureErrorAttribute(secureError, requestError.response, "data", "details");
+                        const requestId = client._etsyRequestId(requestError.response.headers);
+                        if (requestId !== undefined && requestId !== null) {
+                            secureError.requestId = client.secureAttributeValue(requestId);
+                        }
+                    }
+                    EtsyClientV3.debug && console.log(`request err ${JSON.stringify(secureError)}`);
                     reject(secureError);
                 });
         });
     }
 
-    secureErrorAttribute(secureError, sourceError, attribute) {
-        if (!Object.keys(sourceError).includes(attribute)) {
+    secureErrorAttribute(secureError, sourceError, attribute, targetAttribute = attribute) {
+        if (!sourceError || !Object.prototype.hasOwnProperty.call(sourceError, attribute)) {
             return;
         }
-        secureError[attribute] = this.secureAttributeValue(sourceError[attribute]);
+        secureError[targetAttribute] = this.secureAttributeValue(sourceError[attribute]);
     }
 
     secureAttributeValue(value) {
-        return (value === null || value === undefined) ? null : value.replace(new RegExp(this.apiKey, 'g'), "**hidden**");
+        const secrets = [this.apiKey, this.accessToken]
+            .filter(secret => typeof secret === "string" && secret.length > 0)
+            .flatMap(secret => [secret, ...secret.split(":")])
+            .filter(secret => secret.length > 0)
+            .sort((left, right) => right.length - left.length);
+
+        const sanitize = (currentValue, seen = new WeakSet()) => {
+            if (typeof currentValue === "string") {
+                return secrets.reduce(
+                    (sanitized, secret) => sanitized.split(secret).join("**hidden**"),
+                    currentValue
+                );
+            }
+            if (Array.isArray(currentValue)) {
+                if (seen.has(currentValue)) {
+                    return "[Circular]";
+                }
+                seen.add(currentValue);
+                return currentValue.map(item => sanitize(item, seen));
+            }
+            if (currentValue && typeof currentValue === "object") {
+                if (seen.has(currentValue)) {
+                    return "[Circular]";
+                }
+                seen.add(currentValue);
+                return Object.entries(currentValue).reduce((sanitized, [key, nestedValue]) => {
+                    if (!this._isSensitiveErrorAttribute(key)) {
+                        sanitized[key] = sanitize(nestedValue, seen);
+                    }
+                    return sanitized;
+                }, {});
+            }
+            return currentValue;
+        };
+
+        return sanitize(value);
+    }
+
+    _etsyRequestId(headers) {
+        if (!headers) {
+            return undefined;
+        }
+        if (typeof headers.get === "function") {
+            const requestId = headers.get("X-Etsy-Request-Uuid");
+            if (requestId !== undefined && requestId !== null) {
+                return requestId;
+            }
+        }
+        const requestIdHeader = Object.keys(headers).find(
+            header => header.toLowerCase() === "x-etsy-request-uuid"
+        );
+        return requestIdHeader === undefined ? undefined : headers[requestIdHeader];
+    }
+
+    _isSensitiveErrorAttribute(attribute) {
+        return /^(headers|config|request)$/i.test(attribute) ||
+            /(authorization|www-authenticate|x[-_]api[-_]key|token|secret|credential)/i.test(attribute) ||
+            /^api[_-]?key$/i.test(attribute);
     }
 
     getOptions(options) {
