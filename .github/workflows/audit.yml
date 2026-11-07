@@ -14,7 +14,7 @@ jobs:
     strategy:
       matrix:
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-        node-version: [18.x]
+        node-version: [22.x]
 
     steps:
       - name: Checkout code
@@ -41,7 +41,7 @@ jobs:
       - name: CHECK - Check for outdated dependencies (non-blocking warning)
         run: |
           echo "🔍 Checking for outdated dependencies..."
-          if pnpm outdated --depth=3; then
+          if pnpm outdated; then
             echo "::notice title=Deps OK::✅ Dependencies are up to date 🎉"
           else
             echo "::warning title=ℹ️ Outdated Dependencies::Some dependencies are outdated. Please consider updating them."
