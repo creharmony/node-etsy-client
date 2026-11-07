@@ -2,6 +2,7 @@ declare module 'node-etsy-client' {
   type EtsyClientOptions = Partial<{
     apiUrl: string;
     apiKey: string;
+    accessToken: string;
     lang: string;
     shopId: number;
   }>
@@ -14,6 +15,11 @@ declare module 'node-etsy-client' {
     getShop(options?: EtsyClientOptions): Promise<string | object>;
 
     getShopSections(npoptions?: EtsyClientOptions): Promise<string | object>;
+
+    getListingsByListingIds(options: {
+      listing_ids: Array<number | string>;
+      [key: string]: unknown;
+    }): Promise<string | object>;
    /**
     * Finds all active Listings associated with a Shop.
     * 
@@ -45,6 +51,21 @@ declare module 'node-etsy-client' {
    getListingInventory(listingId: number, options?: object): Promise<string | object>;
 
    getListingProduct(listingId: number, productId: number, options?: object): Promise<string | object>;
+
+    getMe(options?: object): Promise<string | object>;
+
+    getShopReceipts(options?: object): Promise<string | object>;
+
+    getShopReceipt(receiptId: number | string, options?: object): Promise<string | object>;
+
+    getShopReceiptTransactionsByReceipt(receiptId: number | string, options?: object): Promise<string | object>;
+
+    getShopReceiptTransactionsByShop(options?: object): Promise<string | object>;
+
+    getListingsInventoryByListingIds(options: {
+      listing_ids: Array<number | string>;
+      [key: string]: unknown;
+    }): Promise<string | object>;
 
    getOptions(options: EtsyClientOptions): EtsyClientOptions;
   }

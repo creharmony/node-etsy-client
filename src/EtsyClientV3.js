@@ -81,6 +81,16 @@ class EtsyClientV3 {
         return this.limitedEtsyApiFetch(`/shops/${this.shopId}/reviews`, options);
     }
 
+    // https://developers.etsy.com/documentation/reference/#operation/getListingsByListingIds
+    getListingsByListingIds(options) {
+        this._assumeField('listing_ids', options?.listing_ids);
+        if (!Array.isArray(options.listing_ids) || options.listing_ids.length === 0) {
+            throw 'listing_ids must be a non-empty array';
+        }
+        const requestOptions = {...options, listing_ids: options.listing_ids.join(',')};
+        return this.limitedEtsyApiFetch(`/listings/batch`, requestOptions);
+    }
+
     // https://developers.etsy.com/documentation/reference/#operation/findAllActiveListingsByShop
     findAllActiveListingsByShop(options) {
         this._assumeShopId();
@@ -142,6 +152,53 @@ class EtsyClientV3 {
         this._assumeField('productId', productId);
         this._assumeOAuth2();
         return this.limitedEtsyApiFetch(`/listings/${listingId}/inventory/products/${productId}`, options);
+    }
+
+    // https://developers.etsy.com/documentation/reference/#operation/getMe
+    getMe(options) {
+        this._assumeOAuth2();
+        return this.limitedEtsyApiFetch(`/users/me`, options);
+    }
+
+    // https://developers.etsy.com/documentation/reference/#operation/getShopReceipts
+    getShopReceipts(options) {
+        this._assumeShopId();
+        this._assumeOAuth2();
+        return this.limitedEtsyApiFetch(`/shops/${this.shopId}/receipts`, options);
+    }
+
+    // https://developers.etsy.com/documentation/reference/#operation/getShopReceipt
+    getShopReceipt(receiptId, options) {
+        this._assumeField('receiptId', receiptId);
+        this._assumeShopId();
+        this._assumeOAuth2();
+        return this.limitedEtsyApiFetch(`/shops/${this.shopId}/receipts/${receiptId}`, options);
+    }
+
+    // https://developers.etsy.com/documentation/reference/#operation/getShopReceiptTransactionsByReceipt
+    getShopReceiptTransactionsByReceipt(receiptId, options) {
+        this._assumeField('receiptId', receiptId);
+        this._assumeShopId();
+        this._assumeOAuth2();
+        return this.limitedEtsyApiFetch(`/shops/${this.shopId}/receipts/${receiptId}/transactions`, options);
+    }
+
+    // https://developers.etsy.com/documentation/reference/#operation/getShopReceiptTransactionsByShop
+    getShopReceiptTransactionsByShop(options) {
+        this._assumeShopId();
+        this._assumeOAuth2();
+        return this.limitedEtsyApiFetch(`/shops/${this.shopId}/transactions`, options);
+    }
+
+    // https://developers.etsy.com/documentation/reference/#operation/getListingsInventoryByListingIds
+    getListingsInventoryByListingIds(options) {
+        this._assumeField('listing_ids', options?.listing_ids);
+        if (!Array.isArray(options.listing_ids) || options.listing_ids.length === 0) {
+            throw 'listing_ids must be a non-empty array';
+        }
+        this._assumeOAuth2();
+        const requestOptions = {...options, listing_ids: options.listing_ids.join(',')};
+        return this.limitedEtsyApiFetch(`/listings/batch/inventory`, requestOptions);
     }
 
     /*
