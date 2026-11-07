@@ -34,6 +34,8 @@ using apiKey + OAuth token:
 
 # Quick start
 
+Requires Node.js 22 or later.
+
 First declare your api key:
 ```
 export ETSY_API_KEY=your_key:your_secret
