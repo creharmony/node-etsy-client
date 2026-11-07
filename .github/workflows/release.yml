@@ -1,0 +1,73 @@
+name: release
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Semantic version bump for the next release
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+        default: patch
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Require main
+        if: github.ref != 'refs/heads/main'
+        run: |
+          echo "::error::Run this workflow from the main branch."
+          exit 1
+
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          ref: main
+          token: ${{ secrets.GH_ACTIONS_TOKEN }}
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v5
+        with:
+          run_install: false
+
+      - name: Set up Node.js 22.x
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22.x
+          cache: pnpm
+
+      - name: Bump version
+        env:
+          BUMP: ${{ inputs.bump }}
+        run: |
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git config user.name 'github-actions[bot]'
+          pnpm version "$BUMP"
+          git branch -f npmjs
+          git push --force origin main npmjs --tags
+
+      - name: Create draft release
+        env:
+          GH_TOKEN: ${{ secrets.GH_ACTIONS_TOKEN }}
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "🔖 Creating draft release for v$VERSION"
+          if gh release view "v$VERSION" > /dev/null 2>&1; then
+            echo "::warning title=ℹ️ Release v$VERSION already exists, skipping."
+          else
+            gh release create "v$VERSION" --draft --generate-notes
+            echo "::notice title=✅ Draft release v$VERSION created. Next: push new version to npm."
+          fi
