@@ -1,4 +1,4 @@
-name: scheduled npm audit
+name: scheduled pnpm audit
 
 on:
   schedule:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   scan:
-    name: npm audit
+    name: pnpm audit
     runs-on: ubuntu-latest
 
     strategy:
@@ -56,11 +56,5 @@ jobs:
             echo "::warning title=ℹ️ vulnerabilities found"
           fi
 
-      - name: Pnpm audit
-        uses: oke-py/npm-audit-action@v3
-        with:
-          audit_level: moderate
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          issue_assignees: creharmony
-          issue_labels: vulnerability,bot
-          dedupe_issues: true
+      - name: QUALITY GATE - Audit production dependencies
+        run: pnpm audit --prod --audit-level=high
