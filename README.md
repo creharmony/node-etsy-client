@@ -26,11 +26,18 @@ using apiKey:
 - getListingVariationImages
 - getListingImages
 - getListingProperty
+- getListingsByListingIds
 
 using apiKey + OAuth token:
 - getListingsByShop
 - getListingInventory
 - getListingProduct
+- getMe
+- getShopReceipts
+- getShopReceipt
+- getShopReceiptTransactionsByReceipt
+- getShopReceiptTransactionsByShop
+- getListingsInventoryByListingIds
 
 # Quick start
 
