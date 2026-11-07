@@ -2,7 +2,7 @@
 
 [![NPM](https://nodei.co/npm/node-etsy-client.png?compact=true)](https://npmjs.org/package/node-etsy-client)
 
-NodeJs Etsy [REST API](https://www.etsy.com/developers/documentation) Client [V3](https://developers.etsy.com/documentation/).
+Node.js client for the Etsy [REST API v3](https://developers.etsy.com/documentation/).
 
 - compatible with JavaScript and TypeScript.
 
@@ -100,7 +100,7 @@ export ETSY_SILENT_API_KEY_WARNING=true
 Note: This is temporary - you must migrate to the new format before January 18, 2026.
 
 ### Etsy client options
-This section describes EtsyClientV2/EtsyClientV3 available options.
+This section describes the `EtsyClientV3` options.
 
 Note about options precedence: 
 - first take option value from constructor if any, 
@@ -109,58 +109,36 @@ Note about options precedence:
 
 Options:
 
-| Name                   | Description                                                                                                                             |
-|------------------------|:----------------------------------------------------------------------------------------------------------------------------------------|
-| `apiUrl`               | Etsy API endpoint - (or env.`ETSY_API_ENDPOINT`) default value is (v2)`https://openapi.etsy.com/v2` / (v3)`https://openapi.etsy.com/v3` |
-| `apiKey`               | Etsy API key - **required** (or env.`ETSY_API_KEY`) without default value. Format: `keystring:shared_secret` (*)                        |
-| `shopId`               | Etsy shop id - *optional* (or env.`ETSY_SHOP_ID`) without default value                                                                 |
-| `lang`                 | Etsy language - *optional* (or env.`ETSY_LANG`) without default value. Example: `fr`                                                    |
-| `dryMode`              | print call instead of making real etsy call - *optional* (or env.`ETSY_DRY_MODE`) with default value: `false`                           |
-| `etsyRateWindowSizeMs` | Rate limit windows size in milliseconds - *optional* (or env.`ETSY_RATE_WINDOWS_SIZE_MS`) with default value: `1000`                    |
-| `etsyRateMaxQueries`   | Rate limit max query per windows size - *optional* (or env.`ETSY_RATE_MAX_QUERIES`) without default value                               |
+| Name                   | Description                                                                                                                |
+|------------------------|:---------------------------------------------------------------------------------------------------------------------------|
+| `apiUrl`               | Etsy API v3 endpoint (or env.`ETSY_API_ENDPOINT`); defaults to `https://openapi.etsy.com/v3/application`                   |
+| `apiKey`               | Etsy API key - **required** (or env.`ETSY_API_KEY`), format: `keystring:shared_secret` (*)                                 |
+| `shopId`               | Etsy shop id - *optional* (or env.`ETSY_SHOP_ID`)                                                                          |
+| `lang`                 | Etsy language - *optional* (or env.`ETSY_LANG`). Example: `fr`                                                            |
+| `dryMode`              | Print calls instead of making real Etsy calls - *optional* (or env.`ETSY_DRY_MODE`), defaults to `false`                  |
+| `etsyRateWindowSizeMs` | Optional rate-limit window size in milliseconds (or env.`ETSY_RATE_WINDOWS_SIZE_MS`); defaults to `1000`                  |
+| `etsyRateMaxQueries`   | Optional maximum queries per rate-limit window (or env.`ETSY_RATE_MAX_QUERIES`); unset by default                          |
 
 (*) shared_secret is mandatory from Jan 18, 2026. Ask one from [Etsy portal](https://www.etsy.com/developers/register).
 
-Note about rate limit options:
+### Rate limiting
 
-- rate limit is recommended for V2 client.
+An optional client-side rate limiter is enabled when both `etsyRateWindowSizeMs` and `etsyRateMaxQueries`
+are set. It limits calls to the configured number of queries per window. For example, to limit the client
+to 10 queries per second:
 
-- rate limit is enabled if and only if `etsyRateWindowSizeMs` and `etsyRateMaxQueries` are both set.
+```
+var client = new EtsyClientV3({
+  apiKey: 'your_key:your_secret',
+  etsyRateWindowSizeMs: 1000,
+  etsyRateMaxQueries: 10
+});
+```
 
-- if enabled, rate limit on etsy call is max `etsyRateMaxQueries` per `etsyRateWindowSizeMs`ms.
-
-For more details, cf. [susi-rali](https://github.com/creharmony/susi-rali)
-
-### Rate limit
-According to [Open API v2 documentation](https://www.etsy.com/developers/documentation/getting_started/api_basics#section_rate_limiting),
-Etsy policy was to restricts number of call to 10 per second (and 10k per day).
-
-With [Open API v3](https://developers.etsy.com/documentation/), there is no such restriction so rate limiter is deprecated and disabled by default. 
-
-In order to rate limit calls, node-etsy-client rely on [susi-rali](https://github.com/creharmony/susi-rali)
-and offer an option to rate limit client calls.
-
-The client retries Etsy `429 Too Many Requests` responses by default, up to three attempts total.
+The client also retries Etsy `429 Too Many Requests` responses by default, up to three attempts total.
 It waits for a valid non-negative integer in the `Retry-After` header (seconds, as described in the
 [Etsy Rate Limits documentation](https://developers.etsy.com/documentation/essentials/rate-limits/)).
 If the header is missing or invalid, the `429` error is returned without retrying. Other errors are not retried.
-
-To apply rate limit of 10 query per seconds (with wait on unavailable slot),
-add `etsyRateMaxQueries` option:
-
-```
-var client = new EtsyClientV2({apiKey:'your_key:your_secret', etsyRateMaxQueries:10});
-```
-
-## Note about ETSY API versions
-
-Starting from 2.0.0 node-etsy-client provide an `EtsyClientV3` utility class dedicated to etsy 3 api calls.
-
-For previous version (v2 Open API will be discontinued) please rely on node-etsy-client <2.0.0 versions.
-
-During migration from v2 to v3 [#39](https://github.com/creharmony/node-etsy-client/issues/39) some ticket have been created on Etsy OpenAPI side, especially for the `getListing` api:
-- `includes` related ticket: etsy/open-api#236 (improvement)
-- `variations values translations` related ticket: etsy/open-api#431 (bug)
 
 ## How to contribute
 
