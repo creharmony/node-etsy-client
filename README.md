@@ -140,6 +140,11 @@ With [Open API v3](https://developers.etsy.com/documentation/), there is no such
 In order to rate limit calls, node-etsy-client rely on [susi-rali](https://github.com/creharmony/susi-rali)
 and offer an option to rate limit client calls.
 
+The client retries Etsy `429 Too Many Requests` responses by default, up to three attempts total.
+It waits for a valid non-negative integer in the `Retry-After` header (seconds, as described in the
+[Etsy Rate Limits documentation](https://developers.etsy.com/documentation/essentials/rate-limits/)).
+If the header is missing or invalid, the `429` error is returned without retrying. Other errors are not retried.
+
 To apply rate limit of 10 query per seconds (with wait on unavailable slot),
 add `etsyRateMaxQueries` option:
 
