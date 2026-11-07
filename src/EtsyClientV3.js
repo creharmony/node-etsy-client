@@ -33,8 +33,7 @@ class EtsyClientV3 {
         this.shopId = "shopId" in options ? options.shopId : process.env.ETSY_SHOP_ID;
         this.accessToken = "accessToken" in options ? options.accessToken : null;
         this.lang = "lang" in options ? options.lang : process.env.ETSY_LANG;
-        // configure rate limit on etsy call : max <etsyRateMaxQueries> per <etsyRateWindowSizeMs> ms
-        // Etsy rate limit doc (10/sec) : https://www.etsy.com/developers/documentation/getting_started/api_basics#section_rate_limiting
+        // Configure an optional client-side limit: max queries per time window.
         this.etsyRateWindowSizeMs = "etsyRateWindowSizeMs" in options ? options.etsyRateWindowSizeMs : (process.env.ETSY_RATE_WINDOWS_SIZE_MS || 1000);
         this.etsyRateMaxQueries = "etsyRateMaxQueries" in options ? options.etsyRateMaxQueries : (process.env.ETSY_RATE_MAX_QUERIES || null);
         this.dryMode = "dryMode" in options ? options.dryMode : ("true" === process.env.ETSY_DRY_MODE || DEFAULT_DRY_MODE);
